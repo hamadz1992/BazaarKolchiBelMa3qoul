@@ -1,5 +1,6 @@
 const { app, BrowserWindow, ipcMain, shell } = require('electron');
 const path = require('path');
+const fs = require('fs');
 
 const isDev = !app.isPackaged;
 
@@ -61,6 +62,13 @@ ipcMain.handle('desktop:print-html', async (event, payload = {}) => {
   const requestedDevice = typeof payload.deviceName === 'string' ? payload.deviceName.trim() : '';
   if (!requestedDevice) return { ok: false, error: 'لم يتم اختيار طابعة.' };
 
+  if (process.platform !== 'win32') {
+    return { ok: false, error: 'مسار الطباعة الحالي مخصص لـ Windows.' };
+  }
+
+  let printWindow;
+  let pdfPath;
+
   try {
     const printers = await sourceWindow.webContents.getPrintersAsync();
     const printer = printers.find((item) => item.name === requestedDevice);
@@ -68,10 +76,10 @@ ipcMain.handle('desktop:print-html', async (event, payload = {}) => {
       return { ok: false, error: `الطابعة المحددة غير موجودة في Windows: ${requestedDevice}` };
     }
 
-    const printWindow = new BrowserWindow({
+    printWindow = new BrowserWindow({
       show: false,
       width: 800,
-      height: 1000,
+      height: 1100,
       backgroundColor: '#ffffff',
       webPreferences: {
         contextIsolation: true,
@@ -86,52 +94,41 @@ ipcMain.handle('desktop:print-html', async (event, payload = {}) => {
       *{box-sizing:border-box}
     </style></head><body>${payload.html}</body></html>`;
 
-    try {
-      await printWindow.loadURL(`data:text/html;charset=UTF-8,${encodeURIComponent(html)}`);
-      if (printWindow.webContents.isLoading()) {
-        await new Promise((resolve) => {
-          const done = () => { printWindow.webContents.removeListener('did-finish-load', done); resolve(); };
-          printWindow.webContents.once('did-finish-load', done);
-        });
-      }
-      await new Promise((resolve) => setTimeout(resolve, 250));
+    await printWindow.loadURL(`data:text/html;charset=UTF-8,${encodeURIComponent(html)}`);
+    await new Promise((resolve) => {
+      if (!printWindow.webContents.isLoading()) return resolve();
+      const done = () => { printWindow.webContents.removeListener('did-finish-load', done); resolve(); };
+      printWindow.webContents.once('did-finish-load', done);
+    });
+    await new Promise((resolve) => setTimeout(resolve, 300));
 
-      const options = {
-        silent: true,
-        printBackground: true,
-        color: false,
-        copies: Math.max(1, Number(payload.copies) || 1),
-        deviceName: printer.name
-      };
+    const pdfBytes = await printWindow.webContents.printToPDF({
+      printBackground: true,
+      marginsType: 1,
+      pageSize: { width: 210000, height: 297000 }
+    });
 
-      const result = await new Promise((resolve) => {
-        let settled = false;
-        const finish = (value) => {
-          if (settled) return;
-          settled = true;
-          clearTimeout(timer);
-          resolve(value);
-        };
-        const timer = setTimeout(() => {
-          finish({ success: false, failureReason: 'انتهت مهلة الطباعة. تأكد أن الطابعة قيد التشغيل وأنها جاهزة في Windows.' });
-        }, 15000);
-        try {
-          printWindow.webContents.print(options, (success, failureReason) => {
-            finish({ success, failureReason: failureReason || '' });
-          });
-        } catch (error) {
-          finish({ success: false, failureReason: error?.message || 'تعذر بدء الطباعة.' });
-        }
-      });
+    const tempDir = path.join(app.getPath('temp'), 'bazaar-kolchi-belma3qoul');
+    fs.mkdirSync(tempDir, { recursive: true });
+    pdfPath = path.join(tempDir, `print-${Date.now()}-${Math.random().toString(36).slice(2)}.pdf`);
+    fs.writeFileSync(pdfPath, pdfBytes);
 
-      return result.success
-        ? { ok: true, printer: printer.name }
-        : { ok: false, error: result.failureReason || 'فشلت عملية الطباعة.' };
-    } finally {
-      if (!printWindow.isDestroyed()) printWindow.close();
-    }
+    const { print } = require('pdf-to-printer');
+    await print(pdfPath, {
+      printer: printer.name,
+      copies: Math.max(1, Number(payload.copies) || 1),
+      silent: true,
+      printDialog: false
+    });
+
+    return { ok: true, printer: printer.name };
   } catch (error) {
     return { ok: false, error: error?.message || 'تعذر تنفيذ الطباعة.' };
+  } finally {
+    if (printWindow && !printWindow.isDestroyed()) printWindow.close();
+    if (pdfPath) {
+      try { fs.unlinkSync(pdfPath); } catch {}
+    }
   }
 });
 
