@@ -68,7 +68,7 @@ function updateProductArea() {
   if (!favoritesBox) {
     favoritesBox = document.createElement('section');
     favoritesBox.className = 'posFavorites';
-    results.parentNode.insertBefore(favoritesBox, cartTable);
+    cartTable.parentNode.insertBefore(favoritesBox, cartTable.nextSibling);
   }
 
   const originals = qsa('.posProduct', results).filter(button => button.textContent.trim());
