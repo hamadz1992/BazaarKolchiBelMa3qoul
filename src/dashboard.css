@@ -1,2 +1,3 @@
-/* Dashboard visual refinement layer */
-.dashboard-polish{display:contents}
+/* Final visual refinement layer for the dashboard reference design */
+.stat,.panel,.notice{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}.stat:hover,.panel:hover,.notice:hover{box-shadow:0 8px 24px rgba(10,24,45,.08)}.stat:hover{transform:translateY(-2px)}
+.navArrow{margin-right:auto!important;width:16px!important;height:16px!important;opacity:.75}.sub button{width:100%;background:transparent;color:#e6ebf2;display:flex;align-items:center;gap:9px;padding:7px 0;text-align:right;font-size:13px}.sub button:hover{color:#fff}.sub button svg{opacity:.75}.chartPanel{overflow:hidden}.chartPanel .panelHead{border-bottom:1px solid #edf0f4}.ops .panelHead{border-bottom:1px solid #edf0f4}.notice{overflow:hidden}.notice button{transition:background .15s ease,transform .15s ease}.notice button:hover{transform:translateY(-1px);background:#fff8f0}.range svg{flex:none}.textBtn svg{flex:none}@media(max-width:800px){.side{box-shadow:-14px 0 30px rgba(0,0,0,.22)}.content{overflow:hidden}}
