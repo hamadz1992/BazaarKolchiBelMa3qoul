@@ -10,13 +10,19 @@ const normalizeScannerValue = value => String(value ?? "")
   .replace(/\s+/g, "")
   .replace(/[^0-9]/g, "");
 
+const isBarcodeInput = input => input?.matches?.(".posSearch input, .barcodeModalSearch input");
+const nativeValueSetter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set;
+
 window.addEventListener("input", event => {
   const input = event.target;
-  if (!(input instanceof HTMLInputElement) || input.placeholder !== "امسح الباركود هنا...") return;
+  if (!(input instanceof HTMLInputElement) || !isBarcodeInput(input) || !nativeValueSetter) return;
 
-  const normalized = normalizeScannerValue(input.value);
-  if (normalized === input.value) return;
+  const value = String(input.value ?? "");
+  if (!/[&é"'(-è_çà٠-٩۰-۹]/.test(value)) return;
 
-  input.value = normalized;
+  const normalized = normalizeScannerValue(value);
+  if (normalized === value) return;
+
+  nativeValueSetter.call(input, normalized);
   input.dispatchEvent(new Event("input", { bubbles: true }));
 }, true);
