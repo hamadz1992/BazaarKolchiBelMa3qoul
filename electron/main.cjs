@@ -21,6 +21,41 @@ function createWindow() {
 
   win.once('ready-to-show', () => win.show());
   win.webContents.setWindowOpenHandler(({ url }) => {
+    const isPosWindow = isDev
+      ? (() => {
+          try {
+            const parsed = new URL(url);
+            return parsed.origin === 'http://127.0.0.1:5173' && parsed.searchParams.get('pos') === '1';
+          } catch {
+            return false;
+          }
+        })()
+      : url.startsWith('file://') && /index\.html\?pos=1(?:#.*)?$/.test(url);
+
+    if (isPosWindow) {
+      return {
+        action: 'allow',
+        outlivesOpener: false,
+        overrideBrowserWindowOptions: {
+          width: 1400,
+          height: 850,
+          minWidth: 1100,
+          minHeight: 700,
+          title: 'نقطة البيع — كل شيء بالمعقول',
+          backgroundColor: '#061426',
+          autoHideMenuBar: true,
+          resizable: true,
+          maximizable: true,
+          minimizable: true,
+          webPreferences: {
+            preload: path.join(__dirname, 'preload.cjs'),
+            contextIsolation: true,
+            nodeIntegration: false
+          }
+        }
+      };
+    }
+
     if (/^https?:/i.test(url)) shell.openExternal(url);
     return { action: 'deny' };
   });
