@@ -39,8 +39,8 @@ function createWindow() {
         overrideBrowserWindowOptions: {
           width: 1400,
           height: 850,
-          minWidth: 1100,
-          minHeight: 700,
+          minWidth: 900,
+          minHeight: 600,
           title: 'نقطة البيع — كل شيء بالمعقول',
           backgroundColor: '#061426',
           autoHideMenuBar: true,
@@ -58,6 +58,19 @@ function createWindow() {
 
     if (/^https?:/i.test(url)) shell.openExternal(url);
     return { action: 'deny' };
+  });
+
+  win.webContents.on('did-create-window', (childWindow, details) => {
+    try {
+      const parsed = new URL(details.url);
+      if (parsed.searchParams.get('pos') === '1') {
+        childWindow.once('ready-to-show', () => {
+          childWindow.maximize();
+          childWindow.show();
+          childWindow.focus();
+        });
+      }
+    } catch {}
   });
 
   if (isDev) win.loadURL('http://127.0.0.1:5173');
