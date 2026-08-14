@@ -1,0 +1,113 @@
+/* Responsive layout for POS - keeps the desktop design intact while fitting smaller displays. */
+
+.posView{width:100%;max-width:100%;overflow-x:hidden}
+
+/* Laptop / small desktop */
+@media (max-width:1200px){
+  .posView{padding:12px 14px 8px}
+  .posSummary{padding:0 28px}
+  .summaryBox{gap:14px}
+  .summaryIcon{width:60px;height:60px}
+  .summaryIcon svg{width:36px;height:36px}
+  .summaryBox span,.summaryTotal span{font-size:16px}
+  .summaryBox strong{font-size:36px}
+  .summaryTotal strong{font-size:52px}
+  .summaryTotal strong small{font-size:20px}
+  .posMain{grid-template-columns:minmax(0,1fr) 340px;gap:12px}
+  .searchRow{gap:10px}
+  .barcodeBtn{width:120px;font-size:16px}
+  .posSearch input{font-size:16px}
+  .cartTableHead{font-size:15px}
+  .cartRow{font-size:14px}
+  .cartProduct strong{font-size:15px}
+  .cartProduct small{font-size:12px}
+  .qtyControls button{width:36px}
+  .qtyControls b{width:38px}
+  .paymentTitle h2{font-size:18px}
+  .payLine{padding:16px 2px}
+  .completeBtn{height:52px;font-size:18px}
+  .posFooterActions{gap:10px}
+  .posFooterActions button{height:58px;font-size:16px}
+}
+
+/* 1024px and similar screens */
+@media (max-width:1050px){
+  .posSummary{height:112px;padding:0 18px}
+  .summaryIcon{width:52px;height:52px}
+  .summaryIcon svg{width:31px;height:31px}
+  .summaryBox span,.summaryTotal span{font-size:14px}
+  .summaryBox strong{font-size:31px}
+  .summaryTotal strong{font-size:44px}
+  .posMain{grid-template-columns:minmax(0,1fr) 300px}
+  .paymentPanel{padding:0 12px 12px}
+  .cartTableHead,.cartRow{grid-template-columns:40px minmax(150px,2fr) .8fr 1fr 1fr 54px}
+  .cartTableHead{height:48px;font-size:14px}
+  .cartRow{min-height:76px}
+  .cartTotals div{height:62px;font-size:14px}
+  .cartTotals b{font-size:25px}
+}
+
+/* Tablet / narrow window: stack the payment panel below the cart instead of squeezing columns. */
+@media (max-width:900px){
+  .posView{padding:8px}
+  .posSummary{height:auto;min-height:0;padding:14px 10px;grid-template-columns:1fr 1fr;gap:10px}
+  .summaryTotal{grid-column:1/-1;grid-row:1}
+  .summaryBox{gap:10px}
+  .summaryBox strong{font-size:28px}
+  .summaryTotal strong{font-size:40px}
+  .summaryIcon{width:48px;height:48px}
+  .posMain{grid-template-columns:1fr}
+  .paymentPanel{order:2}
+  .cartTabs{gap:8px}
+  .cartSelectorButton,.newCartTab{height:56px}
+  .newCartTab{width:150px;min-width:150px;font-size:15px}
+  .cartSelectorButton{font-size:16px}
+  .searchRow{margin-bottom:10px}
+  .barcodeBtn{width:100px;height:52px;font-size:14px}
+  .posSearch{height:52px}
+  .posSearch input{font-size:15px}
+  .posFooterActions{grid-template-columns:1fr 1fr}
+}
+
+/* Phone / very narrow window */
+@media (max-width:600px){
+  .posView{padding:6px}
+  .posSummary{display:flex;flex-direction:column;padding:12px 8px;gap:10px}
+  .summaryTotal{order:-1}
+  .summaryBox{width:100%;justify-content:center}
+  .summaryTotal strong{font-size:34px}
+  .summaryBox strong{font-size:26px}
+  .summaryIcon{width:44px;height:44px}
+  .cartTabs{display:grid;grid-template-columns:minmax(0,1fr) auto}
+  .cartSelectorButton,.newCartTab{height:52px}
+  .newCartTab{width:132px;min-width:132px;font-size:14px}
+  .cartSelectorText small{font-size:9px}
+  .cartSelectorText b{font-size:15px}
+  .cartSelectorButton>span{min-width:32px;height:32px}
+  .cartMenu{top:60px}
+  .searchRow{display:grid;grid-template-columns:1fr auto}
+  .posSearch{height:48px;min-width:0;padding:0 10px}
+  .posSearch input{font-size:14px;min-width:0}
+  .barcodeBtn{width:86px;height:48px;font-size:13px;gap:5px}
+  .barcodeBtn svg{width:20px}
+  .cartTable{overflow-x:auto}
+  .cartTableHead,.cartRow{min-width:700px}
+  .paymentPanel{padding:0 10px 10px}
+  .posFooterActions{grid-template-columns:1fr}
+  .posFooterActions button{height:52px}
+  .keyboardHint{font-size:11px}
+  .barcodeOverlay{padding:30px 10px}
+  .barcodeModal{width:min(420px,calc(100vw - 20px));padding:14px;border-radius:12px}
+  .barcodeModalHeader{padding:0 40px 10px 0}
+  .barcodeModalHeader h2{font-size:18px}
+  .barcodeModalHeader p{font-size:11px}
+  .barcodeModalSearch{height:48px;margin:10px 0;padding:0 10px}
+}
+
+/* Never allow dialogs to become oversized on small displays. */
+@media (max-height:700px){
+  .invoiceOverlay{padding:10px}
+  .invoiceModal{padding:22px 20px 18px}
+  .barcodeOverlay{padding:20px}
+  .barcodeModal{max-height:calc(100vh - 40px);overflow:auto}
+}
