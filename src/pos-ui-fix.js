@@ -37,6 +37,8 @@ function injectFavoriteStyles() {
   const style = document.createElement('style');
   style.id = 'bazaar-favorites-fix';
   style.textContent = `
+    .productResults{display:none!important}
+    body[data-pos-search="active"] .productResults{display:grid!important}
     .posFavorites{display:block!important;width:100%!important;box-sizing:border-box!important;margin:8px 0 10px!important;padding:8px!important;background:#fff!important;border:1px solid #dfe6f0!important;border-radius:10px!important;box-shadow:0 1px 3px rgba(16,35,61,.04)!important;direction:rtl!important}
     .posFavoritesHeader{display:flex!important;align-items:center!important;justify-content:space-between!important;height:30px!important;padding:0 4px 6px!important;margin:0 0 7px!important;border-bottom:1px solid #edf1f6!important;box-sizing:border-box!important}
     .posFavoritesHeader div{display:flex!important;flex-direction:row!important;align-items:center!important;gap:8px!important}
@@ -102,11 +104,13 @@ function updateProductArea() {
   const originals = qsa('.posProduct', results).filter(button => button.textContent.trim());
   const products = originals.map(productData).filter(p => p.barcode);
   const query = String(search.value || '').trim();
+  const hasQuery = Boolean(query && originals.length);
   const signature = `${query}|${products.map(p => `${p.barcode}:${p.name}:${p.price}:${p.stock}`).join('|')}`;
 
-  // React may recreate the results node and remove inline styles. Re-apply
-  // visibility every time, even when the data signature is unchanged.
-  results.style.setProperty('display', query && originals.length ? 'grid' : 'none', 'important');
+  document.body.toggleAttribute('data-pos-search', hasQuery);
+  if (hasQuery) document.body.setAttribute('data-pos-search', 'active');
+
+  results.style.setProperty('display', hasQuery ? 'grid' : 'none', 'important');
 
   if (signature === lastProductSignature) {
     const existingFavorites = qs('.posFavorites');
