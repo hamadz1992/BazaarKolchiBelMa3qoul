@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
-import { Bell, CircleHelp, LogOut, ShoppingCart, Settings, Home, Store, Users, ShieldCheck, Package, Boxes, Warehouse, BarChart3, UserRound, FileText, Cloud, ReceiptText, WalletCards, AlertTriangle, TrendingUp, ChevronLeft, ChevronDown, ChevronUp, CalendarDays, Info, Tags, Ruler, ScanBarcode } from "lucide-react";
+import { Bell, CircleHelp, LogOut, ShoppingCart, Settings, Home, Store, Users, ShieldCheck, Package, Boxes, Warehouse, BarChart3, UserRound, FileText, Cloud, ReceiptText, WalletCards, AlertTriangle, TrendingUp, ChevronLeft, ChevronDown, ChevronUp, CalendarDays, Info, Tags, Ruler, ScanBarcode, ClipboardList } from "lucide-react";
 import "./styles.css";
 import "./dashboard.css";
 import { dashboardData } from "./dashboard-data.js";
