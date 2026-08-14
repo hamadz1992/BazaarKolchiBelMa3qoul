@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import {
   Bell, CircleHelp, LogOut, ShoppingCart, Settings, Home, Store, Users,
   ShieldCheck, Package, Boxes, Warehouse, BarChart3, UserRound, FileText,
-  CloudBackup, ReceiptText, WalletCards, AlertTriangle, TrendingUp,
+  Cloud, ReceiptText, WalletCards, AlertTriangle, TrendingUp,
   ChevronLeft, ChevronDown, ChevronUp, CalendarDays, Info, Tags, Ruler,
   ScanBarcode
 } from "lucide-react";
@@ -17,7 +17,7 @@ const menu = [
   { label: "السلع", Icon: Package, children: [["قائمة السلع", Package],["إضافة سلعة", Boxes],["تصنيفات السلع", Tags],["الوحدات", Ruler],["الباركود", ScanBarcode]] },
   { label: "المخزون", Icon: Warehouse }, { label: "المبيعات", Icon: BarChart3 },
   { label: "العملاء", Icon: UserRound }, { label: "التقارير", Icon: FileText },
-  { label: "النسخ الاحتياطي", Icon: CloudBackup }, { label: "الإعدادات العامة", Icon: Settings }
+  { label: "النسخ الاحتياطي", Icon: Cloud }, { label: "الإعدادات العامة", Icon: Settings }
 ];
 
 function Stat({title,value,unit="دج",note,kind,Icon}){return <article className={`stat ${kind}`}><div className="statIcon"><Icon size={25}/></div><div className="statTitle">{title}</div><div className="statValue">{value}</div><div className="statUnit">{unit}</div>{note&&<div className="statNote">{note}</div>}</article>}
