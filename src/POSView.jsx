@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useState, useEffect } from "react";
-import { CheckCircle2, Minus, Plus, Search, ShoppingCart, Trash2, X, UserRound, Printer, Barcode, Clock, Banknote, ChevronDown, ArrowLeft, ArrowRight } from "lucide-react";
+import { CheckCircle2, Minus, Plus, Search, ShoppingCart, Trash2, X, UserRound, Printer, Barcode, Clock, Banknote, ChevronDown, ArrowLeft, ArrowRight, Edit3, Package, Save } from "lucide-react";
 import { loadProducts, saveProducts } from "./products-data.js";
 import "./pos.css";
 
@@ -36,6 +36,8 @@ async function printInvoice(sale) {
   return result;
 }
 
+const emptyBarcodeEdit = { name: "", barcode: "", category: "", unit: "قطعة", purchase: "", price: "", stock: "", min: "" };
+
 export default function POSView() {
   const [products, setProducts] = useState(() => loadProducts());
   const [carts, setCarts] = useState(() => Array.from({ length: 5 }, () => []));
@@ -49,7 +51,13 @@ export default function POSView() {
   const [printingInvoice, setPrintingInvoice] = useState(false);
   const [printError, setPrintError] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [barcodeModalOpen, setBarcodeModalOpen] = useState(false);
+  const [barcodeValue, setBarcodeValue] = useState("");
+  const [barcodeProduct, setBarcodeProduct] = useState(null);
+  const [barcodeEditMode, setBarcodeEditMode] = useState(false);
+  const [barcodeEditForm, setBarcodeEditForm] = useState(emptyBarcodeEdit);
   const barcodeInputRef = useRef(null);
+  const barcodeModalInputRef = useRef(null);
   const cart = carts[activeCart] || [];
 
   const setCart = updater => setCarts(cs => cs.map((c, i) => i === activeCart ? (typeof updater === "function" ? updater(c) : updater) : c));
@@ -59,6 +67,93 @@ export default function POSView() {
 
   useEffect(() => { setSelectedIndex(cart.length ? Math.min(selectedIndex, cart.length - 1) : -1); }, [activeCart, cart.length]);
   const focusBarcode = () => requestAnimationFrame(() => barcodeInputRef.current?.focus());
+
+  const openBarcodeModal = () => {
+    setBarcodeModalOpen(true);
+    setBarcodeValue("");
+    setBarcodeProduct(null);
+    setBarcodeEditMode(false);
+    setBarcodeEditForm(emptyBarcodeEdit);
+    requestAnimationFrame(() => barcodeModalInputRef.current?.focus());
+  };
+
+  const closeBarcodeModal = () => {
+    setBarcodeModalOpen(false);
+    setBarcodeValue("");
+    setBarcodeProduct(null);
+    setBarcodeEditMode(false);
+    setBarcodeEditForm(emptyBarcodeEdit);
+    focusBarcode();
+  };
+
+  const lookupBarcode = value => {
+    const code = normalizeBarcode(value);
+    if (!code) { setBarcodeProduct(null); return null; }
+    const found = products.find(p => normalizeBarcode(p.barcode) === code) || null;
+    setBarcodeProduct(found);
+    setBarcodeEditMode(false);
+    if (!found) setMessage("المنتج غير موجود");
+    else setMessage("");
+    return found;
+  };
+
+  const handleBarcodeModalChange = e => {
+    const value = e.target.value;
+    setBarcodeValue(value);
+    const code = normalizeBarcode(value);
+    if (!code) { setBarcodeProduct(null); return; }
+    const found = products.find(p => normalizeBarcode(p.barcode) === code) || null;
+    if (found) {
+      setBarcodeProduct(found);
+      setBarcodeEditMode(false);
+      setMessage("");
+    }
+  };
+
+  const handleBarcodeModalKeyDown = e => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      lookupBarcode(barcodeValue);
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      closeBarcodeModal();
+    }
+  };
+
+  const openBarcodeEdit = () => {
+    if (!barcodeProduct) return;
+    setBarcodeEditForm({
+      name: barcodeProduct.name ?? "",
+      barcode: barcodeProduct.barcode ?? "",
+      category: barcodeProduct.category ?? "",
+      unit: barcodeProduct.unit ?? "قطعة",
+      purchase: barcodeProduct.purchase ?? "",
+      price: barcodeProduct.price ?? "",
+      stock: barcodeProduct.stock ?? "",
+      min: barcodeProduct.min ?? ""
+    });
+    setBarcodeEditMode(true);
+  };
+
+  const saveBarcodeEdit = e => {
+    e.preventDefault();
+    if (!barcodeProduct || !String(barcodeEditForm.name).trim() || !barcodeEditForm.price) return;
+    const normalized = {
+      ...barcodeEditForm,
+      purchase: Number(barcodeEditForm.purchase) || 0,
+      price: Number(barcodeEditForm.price) || 0,
+      stock: Number(barcodeEditForm.stock) || 0,
+      min: Number(barcodeEditForm.min) || 0
+    };
+    const nextProducts = products.map(p => p.id === barcodeProduct.id ? { ...p, ...normalized } : p);
+    saveProducts(nextProducts);
+    setProducts(nextProducts);
+    const updated = nextProducts.find(p => p.id === barcodeProduct.id);
+    setBarcodeProduct(updated || null);
+    setBarcodeValue(updated?.barcode || barcodeValue);
+    setBarcodeEditMode(false);
+    setMessage("تم تعديل السلعة بنجاح");
+  };
 
   const add = p => {
     if (Number(p.stock) <= 0) { setMessage("المنتج غير متوفر في المخزون"); setQuery(""); focusBarcode(); return false; }
@@ -94,13 +189,7 @@ export default function POSView() {
     else setMessage("جميع السلات الخمس مستخدمة");
   };
 
-  const handleBarcodeChange = e => {
-    const normalized = normalizeBarcode(e.target.value);
-    setQuery(normalized);
-    if (!normalized) return;
-    const exact = products.find(p => normalizeBarcode(p.barcode) === normalized);
-    if (exact) add(exact);
-  };
+  const handleBarcodeChange = e => setQuery(e.target.value);
 
   const handleBarcodeKeyDown = e => {
     if (e.key === "Enter") {
@@ -117,6 +206,7 @@ export default function POSView() {
 
   useEffect(() => {
     const onKey = e => {
+      if (barcodeModalOpen) return;
       const isInput = ["INPUT", "TEXTAREA", "SELECT"].includes(e.target?.tagName);
       if (e.key === "ArrowLeft") { e.preventDefault(); switchCart(activeCart >= carts.length - 1 ? 0 : activeCart + 1); return; }
       if (e.key === "ArrowRight") { e.preventDefault(); switchCart(activeCart <= 0 ? carts.length - 1 : activeCart - 1); return; }
@@ -134,7 +224,7 @@ export default function POSView() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [cart, carts.length, activeCart, selectedIndex]);
+  }, [cart, carts.length, activeCart, selectedIndex, barcodeModalOpen]);
 
   const complete = () => {
     if (!cart.length) return;
@@ -197,7 +287,7 @@ export default function POSView() {
 
     <div className="posMain">
       <section className="posLeft">
-        <div className="searchRow"><button className="barcodeBtn" onClick={focusBarcode}><Barcode size={27} /> باركود</button><div className="posSearch"><input ref={barcodeInputRef} autoFocus value={query} onChange={handleBarcodeChange} onKeyDown={handleBarcodeKeyDown} placeholder="إبحث باسم السلعة أو الكود أو الباركود" /><Search size={25} /></div></div>
+        <div className="searchRow"><button className="barcodeBtn" onClick={openBarcodeModal}><Barcode size={27} /> باركود</button><div className="posSearch"><input ref={barcodeInputRef} autoFocus value={query} onChange={handleBarcodeChange} onKeyDown={handleBarcodeKeyDown} placeholder="إبحث باسم السلعة أو الكود أو الباركود" /><Search size={25} /></div></div>
         <div className="productResults">{filtered.map(p => <button className="posProduct" key={p.id} onClick={() => add(p)} disabled={Number(p.stock) <= 0}><strong>{p.name}</strong><small>{p.barcode}</small><span>{money(p.price)} دج</span><em>{p.stock > 0 ? `متوفر: ${p.stock}` : "نافد"}</em></button>)}</div>
         <div className="cartTable">
           <div className="cartTableHead"><span>#</span><span>السلعة</span><span>السعر</span><span>الكمية</span><span>الإجمالي</span><span>إجراءات</span></div>
@@ -217,6 +307,34 @@ export default function POSView() {
 
     <div className="posFooterActions"><button className="clearBtn" onClick={() => { setCart([]); setSelectedIndex(-1); }}><Trash2 /> إفراغ السلة</button><button className="printBtn" onClick={() => lastSale && handlePrint()} disabled={!lastSale || printingInvoice}><Printer /> {printingInvoice ? "جاري الطباعة..." : "طباعة الوصل"}</button><button className="holdBtn" onClick={() => setMessage("تم حفظ السلة مؤقتًا")}><Clock /> حفظ مؤقت</button><button className="newSaleBtn2" onClick={startNewCart}><ShoppingCart /> سلة أخرى</button></div>
     <div className="keyboardHint"><ArrowLeft /><ArrowRight /><span>للتنقل بين السلال</span><span className="hintArrows">↑ ↓</span><span>للتنقل بين عناصر السلة</span><b>Delete</b><span>لحذف العنصر</span><span>Esc</span><span>للعودة إلى الباركود</span></div>
+
+    {barcodeModalOpen && <div className="barcodeOverlay" role="dialog" aria-modal="true" aria-labelledby="barcodeDialogTitle" onMouseDown={e => { if (e.target === e.currentTarget) closeBarcodeModal(); }}>
+      <div className="barcodeModal">
+        <button className="barcodeModalClose" onClick={closeBarcodeModal} aria-label="إغلاق"><X size={23} /></button>
+        <div className="barcodeModalHeader"><span className="barcodeModalIcon"><Barcode size={28} /></span><div><h2 id="barcodeDialogTitle">البحث بالباركود</h2><p>أدخل أو امسح رمز السلعة بالماسح</p></div></div>
+        <div className="barcodeModalSearch"><Barcode size={22} /><input ref={barcodeModalInputRef} value={barcodeValue} onChange={handleBarcodeModalChange} onKeyDown={handleBarcodeModalKeyDown} placeholder="امسح الباركود هنا..." autoComplete="off" inputMode="numeric" /></div>
+        {!barcodeProduct && <div className="barcodeModalHint"><Package size={38} /><strong>بانتظار قراءة الباركود</strong><span>بعد القراءة ستظهر بيانات السلعة هنا</span></div>}
+        {barcodeProduct && !barcodeEditMode && <div className="barcodeProductCard">
+          <div className="barcodeProductIcon"><Package size={34} /></div>
+          <div className="barcodeProductInfo"><h3>{barcodeProduct.name}</h3><span>الباركود: {barcodeProduct.barcode}</span><div className="barcodeProductMeta"><b>{money(barcodeProduct.price)} دج</b><span>المخزون: {barcodeProduct.stock}</span><span>{barcodeProduct.category || "بدون تصنيف"}</span></div></div>
+          <button className="barcodeEditBtn" onClick={openBarcodeEdit}><Edit3 size={18} /> تعديل السلعة</button>
+        </div>}
+        {barcodeProduct && barcodeEditMode && <form className="barcodeEditForm" onSubmit={saveBarcodeEdit}>
+          <div className="barcodeEditTitle"><Edit3 size={20} /><strong>تعديل السلعة</strong></div>
+          <div className="barcodeEditGrid">
+            <label>اسم السلعة<input required value={barcodeEditForm.name} onChange={e => setBarcodeEditForm({ ...barcodeEditForm, name: e.target.value })} /></label>
+            <label>الباركود<input value={barcodeEditForm.barcode} onChange={e => setBarcodeEditForm({ ...barcodeEditForm, barcode: e.target.value })} /></label>
+            <label>التصنيف<input value={barcodeEditForm.category} onChange={e => setBarcodeEditForm({ ...barcodeEditForm, category: e.target.value })} /></label>
+            <label>الوحدة<input value={barcodeEditForm.unit} onChange={e => setBarcodeEditForm({ ...barcodeEditForm, unit: e.target.value })} /></label>
+            <label>سعر الشراء<input type="number" min="0" value={barcodeEditForm.purchase} onChange={e => setBarcodeEditForm({ ...barcodeEditForm, purchase: e.target.value })} /></label>
+            <label>سعر البيع<input required type="number" min="0" value={barcodeEditForm.price} onChange={e => setBarcodeEditForm({ ...barcodeEditForm, price: e.target.value })} /></label>
+            <label>الكمية الحالية<input type="number" min="0" value={barcodeEditForm.stock} onChange={e => setBarcodeEditForm({ ...barcodeEditForm, stock: e.target.value })} /></label>
+            <label>الحد الأدنى<input type="number" min="0" value={barcodeEditForm.min} onChange={e => setBarcodeEditForm({ ...barcodeEditForm, min: e.target.value })} /></label>
+          </div>
+          <div className="barcodeEditActions"><button type="button" className="barcodeCancelEdit" onClick={() => setBarcodeEditMode(false)}>إلغاء</button><button type="submit" className="barcodeSaveEdit"><Save size={18} /> حفظ التعديل</button></div>
+        </form>}
+      </div>
+    </div>}
 
     {lastSale && <div className="invoiceOverlay" dir="rtl"><div className="invoiceModal invoiceBasic"><button className="invoiceClose" onClick={() => setLastSale(null)} aria-label="إغلاق"><X size={26} /></button><div className="invoiceSuccess"><span className="successIcon"><CheckCircle2 size={30} /></span><h2>تمت عملية البيع بنجاح</h2></div><div className="invoiceNumber">رقم الفاتورة: <b>{lastSale.invoice}</b></div><div className="basicSale"><div><span>العميل</span><b>{lastSale.customer || "زبون نقدي"}</b></div><div><span>الإجمالي</span><strong>{money(lastSale.total)} دج</strong></div></div><p className="printHint">اضغط «طباعة الفاتورة» لإخراج الوصل بالتفاصيل الكاملة.</p>{printError && <div className="posMessage" style={{ color: "#d7194b" }}>{printError}</div>}<div className="invoiceActions"><button className="newSaleBtn" onClick={() => setLastSale(null)}>عملية جديدة ↻</button><button className="printInvoiceBtn" onClick={handlePrint} disabled={printingInvoice}>{printingInvoice ? <><Printer size={19} /> جاري الطباعة...</> : <><Printer size={19} /> طباعة الفاتورة</>}</button></div></div></div>}
   </div>;
