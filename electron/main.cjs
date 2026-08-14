@@ -107,13 +107,18 @@ ipcMain.handle('desktop:print-html', async (event, payload = {}) => {
       };
       printWindow.webContents.once('did-finish-load', done);
       printWindow.webContents.once('did-fail-load', failed);
+      setTimeout(() => {
+        printWindow.webContents.removeListener('did-finish-load', done);
+        printWindow.webContents.removeListener('did-fail-load', failed);
+        resolve();
+      }, 5000);
     });
 
     await new Promise((resolve) => setTimeout(resolve, 300));
 
     const copies = Math.max(1, Number(payload.copies) || 1);
     const printOptions = {
-      silent: true,
+      silent: false,
       printBackground: true,
       deviceName: printer.name,
       copies,
@@ -126,7 +131,7 @@ ipcMain.handle('desktop:print-html', async (event, payload = {}) => {
       const timer = setTimeout(() => {
         if (settled) return;
         settled = true;
-        reject(new Error('انتهت مهلة الطباعة المباشرة من Electron. لم يستجب مسار الطباعة.'));
+        reject(new Error('انتهت مهلة نافذة الطباعة في Electron. إذا لم تظهر نافذة الطباعة، أخبرني بذلك.'));
       }, 15000);
 
       printWindow.webContents.print(printOptions, (success, failureReason) => {
@@ -134,7 +139,7 @@ ipcMain.handle('desktop:print-html', async (event, payload = {}) => {
         settled = true;
         clearTimeout(timer);
         if (success) resolve({ success: true });
-        else reject(new Error(failureReason || 'رفض Windows عملية الطباعة.'));
+        else reject(new Error(failureReason || 'رفض Electron عملية الطباعة.'));
       });
     });
 
