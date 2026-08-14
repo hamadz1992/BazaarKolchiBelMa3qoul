@@ -2,28 +2,26 @@ const FAVORITES_KEY = 'bazaar-pos-favorites';
 
 const qs = (selector, root = document) => root.querySelector(selector);
 const qsa = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+let lastProductSignature = '';
+let updating = false;
 
-function readFavorites() {
+const readFavorites = () => {
   try {
     const value = JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]');
     return Array.isArray(value) ? value.map(String) : [];
   } catch {
     return [];
   }
-}
+};
 
-function writeFavorites(values) {
-  localStorage.setItem(FAVORITES_KEY, JSON.stringify(values.map(String)));
-}
+const writeFavorites = values => localStorage.setItem(FAVORITES_KEY, JSON.stringify(values.map(String)));
 
-function productData(button) {
-  return {
-    name: qs('strong', button)?.textContent?.trim() || 'سلعة',
-    barcode: qs('small', button)?.textContent?.trim() || '',
-    price: qs('span', button)?.textContent?.trim() || '',
-    stock: qs('em', button)?.textContent?.trim() || ''
-  };
-}
+const productData = button => ({
+  name: qs('strong', button)?.textContent?.trim() || 'سلعة',
+  barcode: qs('small', button)?.textContent?.trim() || '',
+  price: qs('span', button)?.textContent?.trim() || '',
+  stock: qs('em', button)?.textContent?.trim() || ''
+});
 
 function ensureDefaultFavorites(products) {
   let favorites = readFavorites();
@@ -59,58 +57,69 @@ function createFavoriteCard(product, originalButton, onRemove) {
 }
 
 function updateProductArea() {
+  if (updating) return;
   const results = qs('.productResults');
   const cartTable = qs('.cartTable');
   const search = qs('.posSearch input');
   if (!results || !cartTable || !search) return;
 
-  let favoritesBox = qs('.posFavorites');
-  if (!favoritesBox) {
-    favoritesBox = document.createElement('section');
-    favoritesBox.className = 'posFavorites';
-    cartTable.parentNode.insertBefore(favoritesBox, cartTable.nextSibling);
-  }
-
   const originals = qsa('.posProduct', results).filter(button => button.textContent.trim());
   const products = originals.map(productData).filter(p => p.barcode);
   const query = String(search.value || '').trim();
+  const signature = `${query}|${products.map(p => `${p.barcode}:${p.name}:${p.price}:${p.stock}`).join('|')}`;
 
-  if (query) {
-    results.style.display = originals.length ? 'grid' : 'none';
-    favoritesBox.style.display = 'none';
-    return;
+  if (signature === lastProductSignature) return;
+  lastProductSignature = signature;
+
+  updating = true;
+  try {
+    let favoritesBox = qs('.posFavorites');
+    if (!favoritesBox) {
+      favoritesBox = document.createElement('section');
+      favoritesBox.className = 'posFavorites';
+      cartTable.parentNode.insertBefore(favoritesBox, cartTable.nextSibling);
+    }
+
+    if (query) {
+      results.style.display = originals.length ? 'grid' : 'none';
+      favoritesBox.style.display = 'none';
+      return;
+    }
+
+    results.style.display = 'none';
+    favoritesBox.style.display = 'block';
+
+    const favorites = ensureDefaultFavorites(products);
+    const favoriteSet = new Set(favorites);
+    const favoriteOriginals = originals.filter(button => favoriteSet.has(productData(button).barcode));
+
+    favoritesBox.innerHTML = '';
+    const header = document.createElement('div');
+    header.className = 'posFavoritesHeader';
+    header.innerHTML = '<div><strong>المفضلة</strong><small>أضف السلعة للسلة بلمسة واحدة</small></div><span>★</span>';
+    favoritesBox.appendChild(header);
+
+    const grid = document.createElement('div');
+    grid.className = 'posFavoritesGrid';
+    if (!favoriteOriginals.length) {
+      const empty = document.createElement('div');
+      empty.className = 'posFavoritesEmpty';
+      empty.textContent = 'لا توجد سلع مفضلة حاليًا';
+      grid.appendChild(empty);
+    } else {
+      favoriteOriginals.forEach(original => {
+        const data = productData(original);
+        grid.appendChild(createFavoriteCard(data, original, barcode => {
+          writeFavorites(readFavorites().filter(x => x !== String(barcode)));
+          lastProductSignature = '';
+          updateProductArea();
+        }));
+      });
+    }
+    favoritesBox.appendChild(grid);
+  } finally {
+    updating = false;
   }
-
-  results.style.display = 'none';
-  favoritesBox.style.display = 'block';
-
-  const favorites = ensureDefaultFavorites(products);
-  const favoriteSet = new Set(favorites);
-  const favoriteOriginals = originals.filter(button => favoriteSet.has(productData(button).barcode));
-
-  favoritesBox.innerHTML = '';
-  const header = document.createElement('div');
-  header.className = 'posFavoritesHeader';
-  header.innerHTML = '<div><strong>المفضلة</strong><small>أضف السلعة للسلة بلمسة واحدة</small></div><span>★</span>';
-  favoritesBox.appendChild(header);
-
-  const grid = document.createElement('div');
-  grid.className = 'posFavoritesGrid';
-  if (!favoriteOriginals.length) {
-    const empty = document.createElement('div');
-    empty.className = 'posFavoritesEmpty';
-    empty.textContent = 'لا توجد سلع مفضلة حاليًا';
-    grid.appendChild(empty);
-  } else {
-    favoriteOriginals.forEach(original => {
-      const data = productData(original);
-      grid.appendChild(createFavoriteCard(data, original, barcode => {
-        writeFavorites(readFavorites().filter(x => x !== String(barcode)));
-        updateProductArea();
-      }));
-    });
-  }
-  favoritesBox.appendChild(grid);
 }
 
 function ensureCloseRail() {
@@ -122,12 +131,19 @@ function ensureCloseRail() {
     <button type="button" class="posSideRailTab" aria-label="فتح قائمة نقطة البيع">☰</button>
     <div class="posSideRailPanel">
       <div class="posSideRailTitle">نقطة البيع</div>
+      <button type="button" class="posRailPrintButton">طباعة الوصل</button>
       <button type="button" class="posCloseButton">إغلاق نقطة البيع</button>
     </div>`;
   document.body.appendChild(rail);
 
   qs('.posSideRailTab', rail).addEventListener('click', () => rail.classList.toggle('open'));
   qs('.posCloseButton', rail).addEventListener('click', () => window.close());
+  qs('.posRailPrintButton', rail).addEventListener('click', () => {
+    if (window.opener && !window.opener.closed) {
+      window.opener.postMessage({ type: 'bazaar-pos-open-print' }, '*');
+      window.close();
+    }
+  });
 
   document.addEventListener('keydown', event => {
     if (event.key === 'Escape' && !qs('.barcodeOverlay') && !qs('.invoiceOverlay')) {
@@ -139,6 +155,7 @@ function ensureCloseRail() {
 function run() {
   if (!qs('.posView')) return;
   ensureCloseRail();
+  lastProductSignature = '';
   updateProductArea();
 }
 
@@ -150,7 +167,10 @@ const observer = new MutationObserver(() => {
 });
 
 window.addEventListener('input', event => {
-  if (event.target?.matches?.('.posSearch input')) requestAnimationFrame(updateProductArea);
+  if (event.target?.matches?.('.posSearch input')) {
+    lastProductSignature = '';
+    requestAnimationFrame(updateProductArea);
+  }
 });
 
 observer.observe(document.documentElement, { childList: true, subtree: true });
