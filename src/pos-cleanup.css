@@ -1,0 +1,6 @@
+/* Remove the redundant bottom area from POS. */
+.cartTotals,
+.posFooterActions,
+.keyboardHint {
+  display: none !important;
+}
