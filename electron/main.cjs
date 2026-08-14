@@ -1,6 +1,5 @@
 const { app, BrowserWindow, ipcMain, shell } = require('electron');
 const path = require('path');
-const fs = require('fs');
 
 const isDev = !app.isPackaged;
 
@@ -67,8 +66,6 @@ ipcMain.handle('desktop:print-html', async (event, payload = {}) => {
   }
 
   let printWindow;
-  let pdfPath;
-  let keepPdf = false;
 
   try {
     const printers = await sourceWindow.webContents.getPrintersAsync();
@@ -96,52 +93,56 @@ ipcMain.handle('desktop:print-html', async (event, payload = {}) => {
     </style></head><body>${payload.html}</body></html>`;
 
     await printWindow.loadURL(`data:text/html;charset=UTF-8,${encodeURIComponent(html)}`);
-    await new Promise((resolve) => {
+    await new Promise((resolve, reject) => {
       if (!printWindow.webContents.isLoading()) return resolve();
-      const done = () => { printWindow.webContents.removeListener('did-finish-load', done); resolve(); };
+      const done = () => {
+        printWindow.webContents.removeListener('did-finish-load', done);
+        printWindow.webContents.removeListener('did-fail-load', failed);
+        resolve();
+      };
+      const failed = (_event, errorCode, errorDescription) => {
+        printWindow.webContents.removeListener('did-finish-load', done);
+        printWindow.webContents.removeListener('did-fail-load', failed);
+        reject(new Error(`فشل تحميل محتوى الطباعة: ${errorDescription || errorCode}`));
+      };
       printWindow.webContents.once('did-finish-load', done);
+      printWindow.webContents.once('did-fail-load', failed);
     });
+
     await new Promise((resolve) => setTimeout(resolve, 300));
 
-    const pdfBytes = await printWindow.webContents.printToPDF({
-      printBackground: true,
-      marginsType: 1,
-      pageSize: { width: 210000, height: 297000 }
-    });
-
-    const tempDir = path.join(app.getPath('temp'), 'bazaar-kolchi-belma3qoul');
-    fs.mkdirSync(tempDir, { recursive: true });
-    pdfPath = path.join(tempDir, `print-${Date.now()}-${Math.random().toString(36).slice(2)}.pdf`);
-    fs.writeFileSync(pdfPath, pdfBytes);
-
-    const { print } = require('pdf-to-printer');
-    const timeoutMs = 12000;
-    const printPromise = print(pdfPath, {
-      printer: printer.name,
-      copies: Math.max(1, Number(payload.copies) || 1),
+    const copies = Math.max(1, Number(payload.copies) || 1);
+    const printOptions = {
       silent: true,
-      printDialog: false,
-      scale: 'fit'
+      printBackground: true,
+      deviceName: printer.name,
+      copies,
+      margins: { marginType: 'none' },
+      pageSize: { width: 210000, height: 297000 }
+    };
+
+    const result = await new Promise((resolve, reject) => {
+      let settled = false;
+      const timer = setTimeout(() => {
+        if (settled) return;
+        settled = true;
+        reject(new Error('انتهت مهلة الطباعة المباشرة من Electron. لم يستجب مسار الطباعة.'));
+      }, 15000);
+
+      printWindow.webContents.print(printOptions, (success, failureReason) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        if (success) resolve({ success: true });
+        else reject(new Error(failureReason || 'رفض Windows عملية الطباعة.'));
+      });
     });
 
-    await Promise.race([
-      printPromise,
-      new Promise((_, reject) => setTimeout(() => reject(new Error('انتهت مهلة محرك PDF. تم الاحتفاظ بملف الاختبار للتشخيص.')), timeoutMs))
-    ]);
-
-    return { ok: true, printer: printer.name, pdfPath };
+    return { ok: true, printer: printer.name, ...result };
   } catch (error) {
-    keepPdf = Boolean(pdfPath && fs.existsSync(pdfPath));
-    return {
-      ok: false,
-      error: error?.message || 'تعذر تنفيذ الطباعة.',
-      pdfPath: keepPdf ? pdfPath : undefined
-    };
+    return { ok: false, error: error?.message || 'تعذر تنفيذ الطباعة.' };
   } finally {
     if (printWindow && !printWindow.isDestroyed()) printWindow.close();
-    if (pdfPath && !keepPdf) {
-      try { fs.unlinkSync(pdfPath); } catch {}
-    }
   }
 });
 
