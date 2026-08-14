@@ -1,0 +1,9 @@
+:root{--dashboard-pink:#e91e63;--dashboard-navy:#061426;--dashboard-surface:#fff;--dashboard-border:#e1e6ef}
+.top{box-shadow:0 2px 14px rgba(6,20,38,.14)}
+.nav{transition:background-color .15s ease,transform .15s ease}.nav:hover{transform:translateX(-2px)}
+.stat{transition:box-shadow .15s ease,transform .15s ease}.stat:hover{transform:translateY(-2px);box-shadow:0 7px 20px rgba(20,32,52,.09)}
+.panel,.notice{overflow:hidden}
+.panelHead{border-bottom:1px solid #f0f2f6}
+.chartPanel{min-height:305px}
+.operation{transition:background .15s ease;border-radius:7px}.operation:hover{background:#fafbfd}
+.notice{box-shadow:0 2px 8px rgba(20,32,52,.04)}
