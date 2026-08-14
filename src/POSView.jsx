@@ -10,6 +10,13 @@ const esc = v => String(v ?? "").replace(/[&<>\"]/g, m => ({ "&": "&amp;", "<": 
 const loadSales = () => { try { const v = JSON.parse(localStorage.getItem(SALES_KEY) || "[]"); return Array.isArray(v) ? v : []; } catch { return []; } };
 const loadCustomers = () => { try { const v = JSON.parse(localStorage.getItem(CUSTOMERS_KEY) || "[]"); return Array.isArray(v) && v.length ? v : [{ id: 1, name: "زبون نقدي" }]; } catch { return [{ id: 1, name: "زبون نقدي" }]; } };
 
+const normalizeBarcode = value => String(value ?? "")
+  .replace(/[٠-٩]/g, ch => String("٠١٢٣٤٥٦٧٨٩".indexOf(ch)))
+  .replace(/[۰-۹]/g, ch => String("۰۱۲۳۴۵۶۷۸۹".indexOf(ch)))
+  .replace(/[&é"'(-è_çà]/g, ch => ({ "&": "1", "é": "2", "\"": "3", "'": "4", "(": "5", "-": "6", "è": "7", "_": "8", "ç": "9", "à": "0" }[ch] || ch))
+  .replace(/\s+/g, "")
+  .replace(/[^0-9]/g, "");
+
 function buildInvoiceHtml(sale) {
   const items = (sale.items || []).map(i => `<tr><td>${esc(i.name || "سلعة")}</td><td>${i.quantity || 1}</td><td>${money(i.price)}</td><td>${money((i.price || 0) * (i.quantity || 1))}</td></tr>`).join("");
   const d = new Date(sale.createdAt);
@@ -88,22 +95,22 @@ export default function POSView() {
   };
 
   const handleBarcodeChange = e => {
-    const value = e.target.value;
-    setQuery(value);
-    const code = value.trim();
-    if (!code) return;
-    const exact = products.find(p => String(p.barcode ?? "").trim() === code);
+    const normalized = normalizeBarcode(e.target.value);
+    setQuery(normalized);
+    if (!normalized) return;
+    const exact = products.find(p => normalizeBarcode(p.barcode) === normalized);
     if (exact) add(exact);
   };
 
   const handleBarcodeKeyDown = e => {
     if (e.key === "Enter") {
       e.preventDefault();
-      const code = query.trim();
+      const code = normalizeBarcode(query);
       if (!code) return;
-      const exact = products.find(p => String(p.barcode ?? "").trim() === code);
+      const exact = products.find(p => normalizeBarcode(p.barcode) === code);
       if (exact) { add(exact); return; }
-      if (filtered[0]) { add(filtered[0]); return; }
+      const first = filtered[0];
+      if (first) { add(first); return; }
       setMessage("المنتج غير موجود"); setQuery(""); focusBarcode();
     }
   };
@@ -179,9 +186,10 @@ export default function POSView() {
 
     <div className="cartTabs">
       <div className="cartSelector">
-        <button className="cartSelectorButton" onClick={() => setCartMenuOpen(v => !v)}><ShoppingCart size={24} /><b>{activeCartLabel}</b><span>{totalQty}</span><ChevronDown className={cartMenuOpen ? "rotated" : ""} /></button>
+        <button className="cartSelectorButton" onClick={() => setCartMenuOpen(v => !v)}><ShoppingCart size={24} /><div className="cartSelectorText"><small>نقطة البيع</small><b>{activeCartLabel}</b></div><span>{totalQty}</span><ChevronDown className={cartMenuOpen ? "rotated" : ""} /></button>
         {cartMenuOpen && <div className="cartMenu">
-          {carts.map((c, i) => <button key={i} className={i === activeCart ? "cartMenuItem active" : "cartMenuItem"} onClick={() => switchCart(i)}><span>{i === 0 ? "السلة الحالية" : `سلة ${i + 1}`}</span><b>{c.reduce((s, x) => s + x.quantity, 0)}</b></button>)}
+          <div className="cartMenuHeader"><strong>السلات المفتوحة</strong><small>اختر السلة التي تريد العمل عليها</small></div>
+          {carts.map((c, i) => <button key={i} className={i === activeCart ? "cartMenuItem active" : "cartMenuItem"} onClick={() => switchCart(i)}><span className="cartMenuIcon"><ShoppingCart size={17} /></span><span className="cartMenuName">{i === 0 ? "السلة الحالية" : `سلة ${i + 1}`}</span><small>{c.length ? `${c.length} منتجات` : "فارغة"}</small><b>{c.reduce((s, x) => s + x.quantity, 0)}</b></button>)}
         </div>}
       </div>
       <button className="newCartTab" onClick={startNewCart}><Plus /> سلة جديدة</button>
