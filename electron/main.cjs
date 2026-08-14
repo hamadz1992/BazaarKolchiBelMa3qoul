@@ -68,6 +68,7 @@ ipcMain.handle('desktop:print-html', async (event, payload = {}) => {
 
   let printWindow;
   let pdfPath;
+  let keepPdf = false;
 
   try {
     const printers = await sourceWindow.webContents.getPrintersAsync();
@@ -114,19 +115,31 @@ ipcMain.handle('desktop:print-html', async (event, payload = {}) => {
     fs.writeFileSync(pdfPath, pdfBytes);
 
     const { print } = require('pdf-to-printer');
-    await print(pdfPath, {
+    const timeoutMs = 12000;
+    const printPromise = print(pdfPath, {
       printer: printer.name,
       copies: Math.max(1, Number(payload.copies) || 1),
       silent: true,
-      printDialog: false
+      printDialog: false,
+      scale: 'fit'
     });
 
-    return { ok: true, printer: printer.name };
+    await Promise.race([
+      printPromise,
+      new Promise((_, reject) => setTimeout(() => reject(new Error('انتهت مهلة محرك PDF. تم الاحتفاظ بملف الاختبار للتشخيص.')), timeoutMs))
+    ]);
+
+    return { ok: true, printer: printer.name, pdfPath };
   } catch (error) {
-    return { ok: false, error: error?.message || 'تعذر تنفيذ الطباعة.' };
+    keepPdf = Boolean(pdfPath && fs.existsSync(pdfPath));
+    return {
+      ok: false,
+      error: error?.message || 'تعذر تنفيذ الطباعة.',
+      pdfPath: keepPdf ? pdfPath : undefined
+    };
   } finally {
     if (printWindow && !printWindow.isDestroyed()) printWindow.close();
-    if (pdfPath) {
+    if (pdfPath && !keepPdf) {
       try { fs.unlinkSync(pdfPath); } catch {}
     }
   }
