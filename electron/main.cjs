@@ -75,7 +75,7 @@ ipcMain.handle('desktop:print-html', async (event, payload = {}) => {
     }
 
     printWindow = new BrowserWindow({
-      show: true,
+      show: false,
       width: 800,
       height: 1100,
       backgroundColor: '#ffffff',
@@ -118,7 +118,7 @@ ipcMain.handle('desktop:print-html', async (event, payload = {}) => {
 
     const copies = Math.max(1, Number(payload.copies) || 1);
     const printOptions = {
-      silent: false,
+      silent: true,
       printBackground: true,
       deviceName: printer.name,
       copies,
@@ -131,7 +131,7 @@ ipcMain.handle('desktop:print-html', async (event, payload = {}) => {
       const timer = setTimeout(() => {
         if (settled) return;
         settled = true;
-        reject(new Error('انتهت مهلة نافذة الطباعة في Electron.'));
+        reject(new Error('انتهت مهلة الطباعة الصامتة في Electron.'));
       }, 15000);
 
       printWindow.webContents.print(printOptions, (success, failureReason) => {
