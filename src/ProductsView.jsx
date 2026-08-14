@@ -8,29 +8,18 @@ const initialProducts = [
   { id: 3, name: "علبة تخزين", barcode: "622100000003", category: "أواني منزلية", unit: "قطعة", purchase: 180, price: 300, stock: 3, min: 5 },
   { id: 4, name: "مناديل مبللة", barcode: "622100000004", category: "تنظيف", unit: "علبة", purchase: 90, price: 140, stock: 24, min: 6 }
 ];
-
 const emptyProduct = { name: "", barcode: "", category: "", unit: "قطعة", purchase: "", price: "", stock: "", min: "" };
 
-export default function ProductsView() {
+export default function ProductsView({ autoOpen = false }) {
   const [products, setProducts] = useState(initialProducts);
   const [query, setQuery] = useState("");
-  const [modal, setModal] = useState(null);
+  const [modal, setModal] = useState(autoOpen ? "add" : null);
   const [form, setForm] = useState(emptyProduct);
-
   const filtered = useMemo(() => products.filter(p => `${p.name} ${p.barcode} ${p.category}`.toLowerCase().includes(query.toLowerCase())), [products, query]);
-
   const openAdd = () => { setForm(emptyProduct); setModal("add"); };
   const openEdit = (product) => { setForm({ ...product }); setModal(product.id); };
-  const save = (e) => {
-    e.preventDefault();
-    if (!form.name.trim() || !form.price) return;
-    const normalized = { ...form, purchase: Number(form.purchase) || 0, price: Number(form.price) || 0, stock: Number(form.stock) || 0, min: Number(form.min) || 0 };
-    if (modal === "add") setProducts(prev => [...prev, { ...normalized, id: Date.now() }]);
-    else setProducts(prev => prev.map(p => p.id === modal ? { ...p, ...normalized } : p));
-    setModal(null);
-  };
+  const save = (e) => { e.preventDefault(); if (!form.name.trim() || !form.price) return; const normalized = { ...form, purchase: Number(form.purchase) || 0, price: Number(form.price) || 0, stock: Number(form.stock) || 0, min: Number(form.min) || 0 }; if (modal === "add") setProducts(prev => [...prev, { ...normalized, id: Date.now() }]); else setProducts(prev => prev.map(p => p.id === modal ? { ...p, ...normalized } : p)); setModal(null); };
   const remove = (id) => { if (window.confirm("هل تريد حذف هذه السلعة؟")) setProducts(prev => prev.filter(p => p.id !== id)); };
-
   return <div className="productsView" dir="rtl">
     <div className="productsHeader"><div><h1>قائمة السلع</h1><p>إدارة السلع والأسعار والمخزون</p></div><button className="primaryAction" onClick={openAdd}><Plus size={18}/> إضافة سلعة</button></div>
     <div className="productsToolbar"><div className="searchBox"><Search size={18}/><input value={query} onChange={e => setQuery(e.target.value)} placeholder="ابحث باسم السلعة أو الباركود..."/></div><div className="productsCount">{filtered.length} سلع</div></div>
