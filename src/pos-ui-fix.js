@@ -1,223 +1,25 @@
-const FAVORITES_KEY = 'bazaar-pos-favorites';
+const FAVORITES_KEY="bazaar-pos-favorites";
+const qs=(s,r=document)=>r.querySelector(s);
+const qsa=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const readFavorites=()=>{try{const v=JSON.parse(localStorage.getItem(FAVORITES_KEY)||"[]");return Array.isArray(v)?v.map(String):[]}catch{return[]}};
+const writeFavorites=v=>localStorage.setItem(FAVORITES_KEY,JSON.stringify(v.map(String)));
+const productData=b=>({name:qs("strong",b)?.textContent?.trim()||"سلعة",barcode:qs("small",b)?.textContent?.trim()||"",price:qs("span",b)?.textContent?.trim()||"",stock:qs("em",b)?.textContent?.trim()||""});
 
-const qs = (selector, root = document) => root.querySelector(selector);
-const qsa = (selector, root = document) => Array.from(root.querySelectorAll(selector));
-let lastProductSignature = '';
-let updating = false;
+function injectStyles(){if(qs("#bazaar-pos-products-style"))return;const s=document.createElement("style");s.id="bazaar-pos-products-style";s.textContent=`
+.posView .productResults{display:none!important;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;width:100%;margin:0 0 10px;padding:0;box-sizing:border-box;direction:rtl}
+.posView .productResults.posResultsVisible{display:grid!important}
+.posView .posProduct{min-width:0;min-height:70px;padding:8px 10px;border:1px solid #dce4ef;border-radius:9px;background:#fff;color:#17233a;font-family:inherit;text-align:right;cursor:pointer;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto auto;gap:2px 8px;box-sizing:border-box}
+.posView .posProduct:hover:not(:disabled){border-color:#7da7e8;box-shadow:0 4px 12px rgba(16,35,61,.08)}
+.posView .posProduct:disabled{opacity:.5;cursor:not-allowed}.posView .posProduct strong{grid-column:1/-1;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.posView .posProduct small{grid-column:1;font-size:10px;color:#7b8798;direction:ltr;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.posView .posProduct span{grid-column:2;grid-row:2/4;align-self:center;color:#145fd5;font-size:14px;font-weight:800;white-space:nowrap}.posView .posProduct em{grid-column:1;font-size:10px;color:#16845f;font-style:normal;white-space:nowrap}
+.posView .posFavorites{display:none;width:100%;margin:8px 0 10px;padding:8px;box-sizing:border-box;background:#fff;border:1px solid #dfe6f0;border-radius:9px;direction:rtl}.posView .posFavoritesHeader{height:28px;display:flex;align-items:center;justify-content:space-between;padding:0 3px 6px;margin-bottom:7px;border-bottom:1px solid #edf1f6}.posView .posFavoritesHeader strong{font-size:14px;color:#17233a}.posView .posFavoritesHeader small{margin-right:8px;color:#7b8798;font-size:10px}.posView .posFavoritesHeader span{color:#ed1b68}.posView .posFavoritesGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:7px}.posView .posFavoriteCard{position:relative;min-width:0}.posView .posFavoriteMain{width:100%;min-height:52px;padding:6px 29px 6px 8px;border:1px solid #e0e6ef;border-radius:7px;background:#fbfcff;color:#17233a;font-family:inherit;text-align:right;cursor:pointer;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;gap:2px 7px;box-sizing:border-box}.posView .posFavoriteMain strong{grid-column:1/-1;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.posView .posFavoriteMain small{font-size:9px;color:#7b8798;direction:ltr}.posView .posFavoriteMain b{font-size:12px;color:#145fd5}.posView .posFavoriteStar{position:absolute;top:17px;right:7px;width:17px;height:17px;padding:0;border:0;background:transparent;color:#ed1b68;cursor:pointer;z-index:2}
+@media(max-width:900px){.posView .productResults,.posView .posFavoritesGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:560px){.posView .productResults,.posView .posFavoritesGrid{grid-template-columns:1fr}}
+`;document.head.appendChild(s)}
 
-const readFavorites = () => {
-  try {
-    const value = JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]');
-    return Array.isArray(value) ? value.map(String) : [];
-  } catch {
-    return [];
-  }
-};
+function renderFavorites(box,buttons){let fav=readFavorites();const products=buttons.map(productData).filter(p=>p.barcode);if(!fav.length&&products.length){fav=products.slice(0,6).map(p=>p.barcode);writeFavorites(fav)}const selected=buttons.filter(b=>fav.includes(productData(b).barcode));box.innerHTML=`<div class="posFavoritesHeader"><div><strong>المفضلة</strong><small>إضافة سريعة للسلة</small></div><span>★</span></div>`;const grid=document.createElement("div");grid.className="posFavoritesGrid";selected.forEach(original=>{const p=productData(original),card=document.createElement("div"),main=document.createElement("button"),star=document.createElement("button");card.className="posFavoriteCard";main.type="button";main.className="posFavoriteMain";main.innerHTML="<strong></strong><small></small><b></b>";qs("strong",main).textContent=p.name;qs("small",main).textContent=p.barcode;qs("b",main).textContent=p.price;main.onclick=()=>original.click();star.type="button";star.className="posFavoriteStar";star.textContent="★";star.title="إزالة من المفضلة";star.onclick=e=>{e.stopPropagation();writeFavorites(readFavorites().filter(x=>x!==String(p.barcode)));render()};card.append(main,star);grid.appendChild(card)});if(!selected.length){const e=document.createElement("div");e.textContent="لا توجد سلع مفضلة حاليًا";e.style.cssText="grid-column:1/-1;text-align:center;color:#98a2b3;padding:8px;font-size:12px";grid.appendChild(e)}box.appendChild(grid);box.style.setProperty("display","block","important")}
 
-const writeFavorites = values => localStorage.setItem(FAVORITES_KEY, JSON.stringify(values.map(String)));
+function render(){const pos=qs(".posView");if(!pos)return;injectStyles();const results=qs(".productResults",pos),search=qs(".posSearch input",pos),cart=qs(".cartTable",pos);if(!results||!search||!cart)return;const buttons=qsa(".posProduct",results),query=String(search.value||"").trim();let fav=qs(".posFavorites",pos);if(!fav){fav=document.createElement("section");fav.className="posFavorites";cart.parentNode.insertBefore(fav,cart)}if(query){results.classList.add("posResultsVisible");fav.style.setProperty("display","none","important");return}results.classList.remove("posResultsVisible");results.style.setProperty("display","none","important");renderFavorites(fav,buttons)}
 
-const productData = button => ({
-  name: qs('strong', button)?.textContent?.trim() || 'سلعة',
-  barcode: qs('small', button)?.textContent?.trim() || '',
-  price: qs('span', button)?.textContent?.trim() || '',
-  stock: qs('em', button)?.textContent?.trim() || ''
-});
+let frame=0;const schedule=()=>{cancelAnimationFrame(frame);frame=requestAnimationFrame(render)};window.addEventListener("input",e=>{if(e.target?.matches?.(".posSearch input"))schedule()});new MutationObserver(schedule).observe(document.documentElement,{childList:true,subtree:true});window.addEventListener("load",schedule);setTimeout(schedule,250);
 
-function ensureDefaultFavorites(products) {
-  let favorites = readFavorites();
-  if (!favorites.length && products.length) {
-    favorites = products.slice(0, Math.min(6, products.length)).map(p => p.barcode).filter(Boolean);
-    writeFavorites(favorites);
-  }
-  return favorites;
-}
-
-function injectFavoriteStyles() {
-  if (document.getElementById('bazaar-favorites-fix')) return;
-  const style = document.createElement('style');
-  style.id = 'bazaar-favorites-fix';
-  style.textContent = `
-    .productResults{display:none!important}
-    body[data-pos-search="active"] .productResults{display:grid!important}
-    .posFavorites{display:block!important;width:100%!important;box-sizing:border-box!important;margin:8px 0 10px!important;padding:8px!important;background:#fff!important;border:1px solid #dfe6f0!important;border-radius:10px!important;box-shadow:0 1px 3px rgba(16,35,61,.04)!important;direction:rtl!important}
-    .posFavoritesHeader{display:flex!important;align-items:center!important;justify-content:space-between!important;height:30px!important;padding:0 4px 6px!important;margin:0 0 7px!important;border-bottom:1px solid #edf1f6!important;box-sizing:border-box!important}
-    .posFavoritesHeader div{display:flex!important;flex-direction:row!important;align-items:center!important;gap:8px!important}
-    .posFavoritesHeader strong{font-size:15px!important;color:#17233a!important}
-    .posFavoritesHeader small{font-size:10px!important;color:#7b8798!important}
-    .posFavoritesHeader>span{font-size:16px!important;color:#ed1b68!important}
-    .posFavoritesGrid{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))!important;gap:6px!important;width:100%!important}
-    .posFavoriteCard{position:relative!important;min-width:0!important;height:44px!important}
-    .posFavoriteMain{width:100%!important;height:44px!important;min-height:44px!important;box-sizing:border-box!important;border:1px solid #e0e6ef!important;border-radius:7px!important;background:#fbfcff!important;color:#17233a!important;padding:4px 30px 4px 8px!important;text-align:right!important;font-family:inherit!important;cursor:pointer!important;display:grid!important;grid-template-columns:minmax(0,1fr) auto auto!important;grid-template-rows:1fr 1fr!important;align-items:center!important;column-gap:8px!important;row-gap:0!important}
-    .posFavoriteMain:hover{border-color:#8db0e8!important;background:#fff!important}
-    .posFavoriteMain strong{grid-column:1!important;grid-row:1/-1!important;font-size:13px!important;font-weight:800!important;max-width:100%!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
-    .posFavoriteMain small{grid-column:2!important;grid-row:1!important;font-size:9px!important;color:#7b8798!important;white-space:nowrap!important}
-    .posFavoriteMain b{grid-column:3!important;grid-row:1/-1!important;font-size:12px!important;color:#145fd5!important;white-space:nowrap!important}
-    .posFavoriteMain em{grid-column:2!important;grid-row:2!important;font-size:9px!important;color:#16845f!important;font-style:normal!important;white-space:nowrap!important}
-    .posFavoriteStar{position:absolute!important;top:12px!important;right:7px!important;width:17px!important;height:17px!important;border:0!important;background:transparent!important;color:#ed1b68!important;font-size:13px!important;cursor:pointer!important;padding:0!important;z-index:3!important}
-    .posFavoritesEmpty{grid-column:1/-1!important;text-align:center!important;color:#98a2b3!important;padding:10px!important}
-    @media(max-width:900px){.posFavoritesGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
-    @media(max-width:600px){.posFavoritesGrid{grid-template-columns:1fr!important}}
-  `;
-  document.head.appendChild(style);
-}
-
-function createFavoriteCard(product, originalButton, onRemove) {
-  const card = document.createElement('div');
-  card.className = 'posFavoriteCard';
-
-  const main = document.createElement('button');
-  main.type = 'button';
-  main.className = 'posFavoriteMain';
-
-  const name = document.createElement('strong');
-  name.textContent = product.name;
-  const barcode = document.createElement('small');
-  barcode.textContent = product.barcode;
-  const price = document.createElement('b');
-  price.textContent = product.price;
-  const stock = document.createElement('em');
-  stock.textContent = product.stock;
-  main.append(name, barcode, price, stock);
-  main.addEventListener('click', () => originalButton.click());
-
-  const star = document.createElement('button');
-  star.type = 'button';
-  star.className = 'posFavoriteStar';
-  star.title = 'إزالة من المفضلة';
-  star.textContent = '★';
-  star.addEventListener('click', event => {
-    event.stopPropagation();
-    onRemove(product.barcode);
-  });
-
-  card.append(main, star);
-  return card;
-}
-
-function updateProductArea() {
-  if (updating) return;
-  const results = qs('.productResults');
-  const cartTable = qs('.cartTable');
-  const search = qs('.posSearch input');
-  if (!results || !cartTable || !search) return;
-
-  const originals = qsa('.posProduct', results).filter(button => button.textContent.trim());
-  const products = originals.map(productData).filter(p => p.barcode);
-  const query = String(search.value || '').trim();
-  const hasQuery = Boolean(query && originals.length);
-  const signature = `${query}|${products.map(p => `${p.barcode}:${p.name}:${p.price}:${p.stock}`).join('|')}`;
-
-  document.body.toggleAttribute('data-pos-search', hasQuery);
-  if (hasQuery) document.body.setAttribute('data-pos-search', 'active');
-
-  results.style.setProperty('display', hasQuery ? 'grid' : 'none', 'important');
-
-  if (signature === lastProductSignature) {
-    const existingFavorites = qs('.posFavorites');
-    if (existingFavorites) existingFavorites.style.setProperty('display', query ? 'none' : 'block', 'important');
-    return;
-  }
-  lastProductSignature = signature;
-
-  updating = true;
-  try {
-    injectFavoriteStyles();
-    let favoritesBox = qs('.posFavorites');
-    if (!favoritesBox) {
-      favoritesBox = document.createElement('section');
-      favoritesBox.className = 'posFavorites';
-      cartTable.parentNode.insertBefore(favoritesBox, cartTable.nextSibling);
-    }
-
-    if (query) {
-      favoritesBox.style.setProperty('display', 'none', 'important');
-      return;
-    }
-
-    favoritesBox.style.setProperty('display', 'block', 'important');
-
-    const favorites = ensureDefaultFavorites(products);
-    const favoriteSet = new Set(favorites);
-    const favoriteOriginals = originals.filter(button => favoriteSet.has(productData(button).barcode));
-
-    favoritesBox.innerHTML = '';
-    const header = document.createElement('div');
-    header.className = 'posFavoritesHeader';
-    const headerText = document.createElement('div');
-    const title = document.createElement('strong');
-    title.textContent = 'المفضلة';
-    const hint = document.createElement('small');
-    hint.textContent = 'إضافة سريعة للسلة';
-    headerText.append(title, hint);
-    const icon = document.createElement('span');
-    icon.textContent = '★';
-    header.append(headerText, icon);
-    favoritesBox.appendChild(header);
-
-    const grid = document.createElement('div');
-    grid.className = 'posFavoritesGrid';
-    if (!favoriteOriginals.length) {
-      const empty = document.createElement('div');
-      empty.className = 'posFavoritesEmpty';
-      empty.textContent = 'لا توجد سلع مفضلة حاليًا';
-      grid.appendChild(empty);
-    } else {
-      favoriteOriginals.forEach(original => {
-        const data = productData(original);
-        grid.appendChild(createFavoriteCard(data, original, barcode => {
-          writeFavorites(readFavorites().filter(x => x !== String(barcode)));
-          lastProductSignature = '';
-          updateProductArea();
-        }));
-      });
-    }
-    favoritesBox.appendChild(grid);
-  } finally {
-    updating = false;
-  }
-}
-
-function ensureCloseRail() {
-  if (qs('.posSideRail')) return;
-  const rail = document.createElement('aside');
-  rail.className = 'posSideRail';
-  rail.innerHTML = `<button type="button" class="posSideRailTab" aria-label="فتح قائمة نقطة البيع">☰</button><div class="posSideRailPanel"><div class="posSideRailTitle">نقطة البيع</div><button type="button" class="posRailPrintButton">طباعة الوصل</button><button type="button" class="posCloseButton">إغلاق نقطة البيع</button></div>`;
-  document.body.appendChild(rail);
-  qs('.posSideRailTab', rail).addEventListener('click', () => rail.classList.toggle('open'));
-  qs('.posCloseButton', rail).addEventListener('click', () => window.close());
-  qs('.posRailPrintButton', rail).addEventListener('click', () => {
-    if (window.opener && !window.opener.closed) {
-      window.opener.postMessage({ type: 'bazaar-pos-open-print' }, '*');
-      window.close();
-    }
-  });
-  document.addEventListener('keydown', event => {
-    if (event.key === 'Escape' && !qs('.barcodeOverlay') && !qs('.invoiceOverlay')) rail.classList.remove('open');
-  });
-}
-
-function run() {
-  if (!qs('.posView')) return;
-  injectFavoriteStyles();
-  ensureCloseRail();
-  lastProductSignature = '';
-  updateProductArea();
-}
-
-const observer = new MutationObserver(() => {
-  if (qs('.posView')) {
-    ensureCloseRail();
-    updateProductArea();
-  }
-});
-
-window.addEventListener('input', event => {
-  if (event.target?.matches?.('.posSearch input')) {
-    lastProductSignature = '';
-    requestAnimationFrame(updateProductArea);
-  }
-});
-
-observer.observe(document.documentElement, { childList: true, subtree: true });
-window.addEventListener('load', run);
-setTimeout(run, 300);
+function ensureCloseRail(){if(qs(".posSideRail"))return;const rail=document.createElement("aside");rail.className="posSideRail";rail.innerHTML='<button type="button" class="posSideRailTab">☰</button><div class="posSideRailPanel"><div class="posSideRailTitle">نقطة البيع</div><button type="button" class="posRailPrintButton">طباعة الوصل</button><button type="button" class="posCloseButton">إغلاق نقطة البيع</button></div>';document.body.appendChild(rail);qs(".posSideRailTab",rail).onclick=()=>rail.classList.toggle("open");qs(".posCloseButton",rail).onclick=()=>window.close();document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!qs(".barcodeOverlay")&&!qs(".invoiceOverlay"))rail.classList.remove("open")})}
+const observer=new MutationObserver(()=>{if(qs(".posView"))ensureCloseRail()});observer.observe(document.documentElement,{childList:true,subtree:true});window.addEventListener("load",ensureCloseRail);setTimeout(ensureCloseRail,300);
