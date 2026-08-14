@@ -32,6 +32,33 @@ function ensureDefaultFavorites(products) {
   return favorites;
 }
 
+function injectFavoriteStyles() {
+  if (document.getElementById('bazaar-favorites-fix')) return;
+  const style = document.createElement('style');
+  style.id = 'bazaar-favorites-fix';
+  style.textContent = `
+    .posFavorites{display:block!important;width:100%!important;box-sizing:border-box!important;margin:8px 0 10px!important;padding:8px!important;background:#fff!important;border:1px solid #dfe6f0!important;border-radius:10px!important;box-shadow:0 1px 3px rgba(16,35,61,.04)!important;direction:rtl!important}
+    .posFavoritesHeader{display:flex!important;align-items:center!important;justify-content:space-between!important;height:30px!important;padding:0 4px 6px!important;margin:0 0 7px!important;border-bottom:1px solid #edf1f6!important;box-sizing:border-box!important}
+    .posFavoritesHeader div{display:flex!important;flex-direction:row!important;align-items:center!important;gap:8px!important}
+    .posFavoritesHeader strong{font-size:15px!important;color:#17233a!important}
+    .posFavoritesHeader small{font-size:10px!important;color:#7b8798!important}
+    .posFavoritesHeader>span{font-size:16px!important;color:#ed1b68!important}
+    .posFavoritesGrid{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))!important;gap:6px!important;width:100%!important}
+    .posFavoriteCard{position:relative!important;min-width:0!important;height:44px!important}
+    .posFavoriteMain{width:100%!important;height:44px!important;min-height:44px!important;box-sizing:border-box!important;border:1px solid #e0e6ef!important;border-radius:7px!important;background:#fbfcff!important;color:#17233a!important;padding:4px 30px 4px 8px!important;text-align:right!important;font-family:inherit!important;cursor:pointer!important;display:grid!important;grid-template-columns:minmax(0,1fr) auto auto!important;grid-template-rows:1fr 1fr!important;align-items:center!important;column-gap:8px!important;row-gap:0!important}
+    .posFavoriteMain:hover{border-color:#8db0e8!important;background:#fff!important}
+    .posFavoriteMain strong{grid-column:1!important;grid-row:1/-1!important;font-size:13px!important;font-weight:800!important;max-width:100%!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+    .posFavoriteMain small{grid-column:2!important;grid-row:1!important;font-size:9px!important;color:#7b8798!important;white-space:nowrap!important}
+    .posFavoriteMain b{grid-column:3!important;grid-row:1/-1!important;font-size:12px!important;color:#145fd5!important;white-space:nowrap!important}
+    .posFavoriteMain em{grid-column:2!important;grid-row:2!important;font-size:9px!important;color:#16845f!important;font-style:normal!important;white-space:nowrap!important}
+    .posFavoriteStar{position:absolute!important;top:12px!important;right:7px!important;width:17px!important;height:17px!important;border:0!important;background:transparent!important;color:#ed1b68!important;font-size:13px!important;cursor:pointer!important;padding:0!important;z-index:3!important}
+    .posFavoritesEmpty{grid-column:1/-1!important;text-align:center!important;color:#98a2b3!important;padding:10px!important}
+    @media(max-width:900px){.posFavoritesGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+    @media(max-width:600px){.posFavoritesGrid{grid-template-columns:1fr!important}}
+  `;
+  document.head.appendChild(style);
+}
+
 function createFavoriteCard(product, originalButton, onRemove) {
   const card = document.createElement('div');
   card.className = 'posFavoriteCard';
@@ -39,7 +66,16 @@ function createFavoriteCard(product, originalButton, onRemove) {
   const main = document.createElement('button');
   main.type = 'button';
   main.className = 'posFavoriteMain';
-  main.innerHTML = `<strong>${product.name}</strong><small>${product.barcode}</small><b>${product.price}</b><em>${product.stock}</em>`;
+
+  const name = document.createElement('strong');
+  name.textContent = product.name;
+  const barcode = document.createElement('small');
+  barcode.textContent = product.barcode;
+  const price = document.createElement('b');
+  price.textContent = product.price;
+  const stock = document.createElement('em');
+  stock.textContent = product.stock;
+  main.append(name, barcode, price, stock);
   main.addEventListener('click', () => originalButton.click());
 
   const star = document.createElement('button');
@@ -73,6 +109,7 @@ function updateProductArea() {
 
   updating = true;
   try {
+    injectFavoriteStyles();
     let favoritesBox = qs('.posFavorites');
     if (!favoritesBox) {
       favoritesBox = document.createElement('section');
@@ -96,7 +133,15 @@ function updateProductArea() {
     favoritesBox.innerHTML = '';
     const header = document.createElement('div');
     header.className = 'posFavoritesHeader';
-    header.innerHTML = '<div><strong>المفضلة</strong><small>أضف السلعة للسلة بلمسة واحدة</small></div><span>★</span>';
+    const headerText = document.createElement('div');
+    const title = document.createElement('strong');
+    title.textContent = 'المفضلة';
+    const hint = document.createElement('small');
+    hint.textContent = 'إضافة سريعة للسلة';
+    headerText.append(title, hint);
+    const icon = document.createElement('span');
+    icon.textContent = '★';
+    header.append(headerText, icon);
     favoritesBox.appendChild(header);
 
     const grid = document.createElement('div');
@@ -124,18 +169,10 @@ function updateProductArea() {
 
 function ensureCloseRail() {
   if (qs('.posSideRail')) return;
-
   const rail = document.createElement('aside');
   rail.className = 'posSideRail';
-  rail.innerHTML = `
-    <button type="button" class="posSideRailTab" aria-label="فتح قائمة نقطة البيع">☰</button>
-    <div class="posSideRailPanel">
-      <div class="posSideRailTitle">نقطة البيع</div>
-      <button type="button" class="posRailPrintButton">طباعة الوصل</button>
-      <button type="button" class="posCloseButton">إغلاق نقطة البيع</button>
-    </div>`;
+  rail.innerHTML = `<button type="button" class="posSideRailTab" aria-label="فتح قائمة نقطة البيع">☰</button><div class="posSideRailPanel"><div class="posSideRailTitle">نقطة البيع</div><button type="button" class="posRailPrintButton">طباعة الوصل</button><button type="button" class="posCloseButton">إغلاق نقطة البيع</button></div>`;
   document.body.appendChild(rail);
-
   qs('.posSideRailTab', rail).addEventListener('click', () => rail.classList.toggle('open'));
   qs('.posCloseButton', rail).addEventListener('click', () => window.close());
   qs('.posRailPrintButton', rail).addEventListener('click', () => {
@@ -144,16 +181,14 @@ function ensureCloseRail() {
       window.close();
     }
   });
-
   document.addEventListener('keydown', event => {
-    if (event.key === 'Escape' && !qs('.barcodeOverlay') && !qs('.invoiceOverlay')) {
-      rail.classList.remove('open');
-    }
+    if (event.key === 'Escape' && !qs('.barcodeOverlay') && !qs('.invoiceOverlay')) rail.classList.remove('open');
   });
 }
 
 function run() {
   if (!qs('.posView')) return;
+  injectFavoriteStyles();
   ensureCloseRail();
   lastProductSignature = '';
   updateProductArea();
