@@ -75,10 +75,11 @@ ipcMain.handle('desktop:print-html', async (event, payload = {}) => {
     }
 
     printWindow = new BrowserWindow({
-      show: false,
-      width: 800,
-      height: 1100,
+      show: true,
+      width: 900,
+      height: 1000,
       backgroundColor: '#ffffff',
+      autoHideMenuBar: true,
       webPreferences: {
         contextIsolation: true,
         nodeIntegration: false,
@@ -114,7 +115,8 @@ ipcMain.handle('desktop:print-html', async (event, payload = {}) => {
       }, 5000);
     });
 
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    printWindow.focus();
 
     const copies = Math.max(1, Number(payload.copies) || 1);
     const printOptions = {
@@ -123,7 +125,7 @@ ipcMain.handle('desktop:print-html', async (event, payload = {}) => {
       deviceName: printer.name,
       copies,
       margins: { marginType: 'none' },
-      pageSize: { width: 210000, height: 297000 }
+      usePrinterDefaultPageSize: true
     };
 
     const result = await new Promise((resolve, reject) => {
@@ -131,7 +133,7 @@ ipcMain.handle('desktop:print-html', async (event, payload = {}) => {
       const timer = setTimeout(() => {
         if (settled) return;
         settled = true;
-        reject(new Error('انتهت مهلة نافذة الطباعة في Electron. إذا لم تظهر نافذة الطباعة، أخبرني بذلك.'));
+        reject(new Error('انتهت مهلة نافذة الطباعة المرئية في Electron.'));
       }, 15000);
 
       printWindow.webContents.print(printOptions, (success, failureReason) => {
