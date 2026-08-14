@@ -104,7 +104,15 @@ function updateProductArea() {
   const query = String(search.value || '').trim();
   const signature = `${query}|${products.map(p => `${p.barcode}:${p.name}:${p.price}:${p.stock}`).join('|')}`;
 
-  if (signature === lastProductSignature) return;
+  // React may recreate the results node and remove inline styles. Re-apply
+  // visibility every time, even when the data signature is unchanged.
+  results.style.setProperty('display', query && originals.length ? 'grid' : 'none', 'important');
+
+  if (signature === lastProductSignature) {
+    const existingFavorites = qs('.posFavorites');
+    if (existingFavorites) existingFavorites.style.setProperty('display', query ? 'none' : 'block', 'important');
+    return;
+  }
   lastProductSignature = signature;
 
   updating = true;
@@ -118,13 +126,11 @@ function updateProductArea() {
     }
 
     if (query) {
-      results.style.display = originals.length ? 'grid' : 'none';
-      favoritesBox.style.display = 'none';
+      favoritesBox.style.setProperty('display', 'none', 'important');
       return;
     }
 
-    results.style.display = 'none';
-    favoritesBox.style.display = 'block';
+    favoritesBox.style.setProperty('display', 'block', 'important');
 
     const favorites = ensureDefaultFavorites(products);
     const favoriteSet = new Set(favorites);
