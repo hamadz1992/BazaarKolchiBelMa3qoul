@@ -1,14 +1,17 @@
 import React, { useMemo, useRef, useState, useEffect } from "react";
-import { CheckCircle2, Minus, Plus, Search, ShoppingCart, Trash2, X, UserRound, Printer, Barcode, Clock, Banknote, ChevronDown, ArrowLeft, ArrowRight, Edit3, Package, Save } from "lucide-react";
+import { CheckCircle2, Minus, Plus, Search, ShoppingCart, Trash2, X, UserRound, UserPlus, Printer, Barcode, Clock, Banknote, ChevronDown, ArrowLeft, ArrowRight, Edit3, Package, Save, Star, LogOut } from "lucide-react";
 import { loadProducts, saveProducts } from "./products-data.js";
 import "./pos.css";
 
 const SALES_KEY = "bazaar_sales";
 const CUSTOMERS_KEY = "bazaar-kolchi-customers";
+const FAVORITES_KEY = "bazaar-pos-favorites";
 const money = n => Number(n || 0).toLocaleString("en-US", { minimumFractionDigits: 0 });
 const esc = v => String(v ?? "").replace(/[&<>\"]/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[m]));
 const loadSales = () => { try { const v = JSON.parse(localStorage.getItem(SALES_KEY) || "[]"); return Array.isArray(v) ? v : []; } catch { return []; } };
 const loadCustomers = () => { try { const v = JSON.parse(localStorage.getItem(CUSTOMERS_KEY) || "[]"); return Array.isArray(v) && v.length ? v : [{ id: 1, name: "زبون نقدي" }]; } catch { return [{ id: 1, name: "زبون نقدي" }]; } };
+const loadFavorites = () => { try { const v = JSON.parse(localStorage.getItem(FAVORITES_KEY) || "[]"); return Array.isArray(v) ? v.map(String) : []; } catch { return []; } };
+const favoriteKey = p => String(p.barcode || p.id);
 
 const normalizeBarcode = value => String(value ?? "")
   .replace(/[٠-٩]/g, ch => String("٠١٢٣٤٥٦٧٨٩".indexOf(ch)))
@@ -42,11 +45,13 @@ export default function POSView() {
   const [products, setProducts] = useState(() => loadProducts());
   const [carts, setCarts] = useState(() => Array.from({ length: 5 }, () => []));
   const [activeCart, setActiveCart] = useState(0);
-  const [cartMenuOpen, setCartMenuOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [message, setMessage] = useState("");
-  const [customers] = useState(loadCustomers);
+  const [customers, setCustomers] = useState(loadCustomers);
   const [customer, setCustomer] = useState("زبون نقدي");
+  const [customerModalOpen, setCustomerModalOpen] = useState(false);
+  const [newCustomerName, setNewCustomerName] = useState("");
+  const [favorites, setFavorites] = useState(loadFavorites);
   const [lastSale, setLastSale] = useState(null);
   const [printingInvoice, setPrintingInvoice] = useState(false);
   const [printError, setPrintError] = useState("");
@@ -61,9 +66,33 @@ export default function POSView() {
   const cart = carts[activeCart] || [];
 
   const setCart = updater => setCarts(cs => cs.map((c, i) => i === activeCart ? (typeof updater === "function" ? updater(c) : updater) : c));
-  const filtered = useMemo(() => products.filter(p => `${p.name} ${p.barcode} ${p.category}`.toLowerCase().includes(query.toLowerCase())), [products, query]);
+  const filtered = useMemo(() => {
+    const raw = query.trim();
+    if (!raw) return [];
+    const q = raw.toLowerCase();
+    // نطابق الأرقام بغض النظر عن رمز/لغة لوحة المفاتيح أو الجهاز (عربي، فارسي، AZERTY...)
+    const qDigits = normalizeBarcode(raw);
+    return products.filter(p => {
+      if (`${p.name} ${p.barcode} ${p.category}`.toLowerCase().includes(q)) return true;
+      if (qDigits) {
+        const pDigits = normalizeBarcode(p.barcode);
+        if (pDigits && pDigits.includes(qDigits)) return true;
+      }
+      return false;
+    });
+  }, [products, query]);
   const totalQty = cart.reduce((s, i) => s + i.quantity, 0);
   const total = cart.reduce((s, i) => s + Number(i.price) * i.quantity, 0);
+  const isFavorite = p => favorites.includes(favoriteKey(p));
+  const toggleFavorite = p => {
+    const key = favoriteKey(p);
+    setFavorites(f => {
+      const next = f.includes(key) ? f.filter(x => x !== key) : [...f, key];
+      localStorage.setItem(FAVORITES_KEY, JSON.stringify(next));
+      return next;
+    });
+  };
+  const favoriteProducts = useMemo(() => products.filter(p => favorites.includes(favoriteKey(p))), [products, favorites]);
 
   useEffect(() => { setSelectedIndex(cart.length ? Math.min(selectedIndex, cart.length - 1) : -1); }, [activeCart, cart.length]);
   const focusBarcode = () => requestAnimationFrame(() => barcodeInputRef.current?.focus());
@@ -179,7 +208,6 @@ export default function POSView() {
     if (index < 0 || index >= carts.length) return;
     setActiveCart(index);
     setSelectedIndex(-1);
-    setCartMenuOpen(false);
     focusBarcode();
   };
 
@@ -220,7 +248,7 @@ export default function POSView() {
       if (isInput && e.target !== barcodeInputRef.current) return;
       if (e.key === "ArrowDown" && cart.length) { e.preventDefault(); setSelectedIndex(i => Math.min(cart.length - 1, i < 0 ? 0 : i + 1)); }
       else if (e.key === "ArrowUp" && cart.length) { e.preventDefault(); setSelectedIndex(i => Math.max(0, i < 0 ? cart.length - 1 : i - 1)); }
-      else if (e.key === "Escape") { focusBarcode(); setCartMenuOpen(false); }
+      else if (e.key === "Escape") { focusBarcode(); }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -265,30 +293,53 @@ export default function POSView() {
     finally { setPrintingInvoice(false); }
   };
 
-  const activeCartLabel = activeCart === 0 ? "السلة الحالية" : `سلة ${activeCart + 1}`;
+  const handleTopPrint = () => {
+    if (!lastSale) { setMessage("لا توجد فاتورة لطباعتها بعد"); return; }
+    handlePrint();
+  };
+
+  const handleExitPOS = () => { window.close(); };
+
+  const openAddCustomer = () => { setNewCustomerName(""); setCustomerModalOpen(true); };
+
+  const saveNewCustomer = e => {
+    e.preventDefault();
+    const name = newCustomerName.trim();
+    if (!name) return;
+    if (customers.some(c => c.name === name)) { setCustomer(name); setCustomerModalOpen(false); return; }
+    const nextCustomers = [...customers, { id: Date.now(), name }];
+    localStorage.setItem(CUSTOMERS_KEY, JSON.stringify(nextCustomers));
+    setCustomers(nextCustomers);
+    setCustomer(name);
+    setNewCustomerName("");
+    setCustomerModalOpen(false);
+    setMessage("تمت إضافة العميل بنجاح");
+  };
 
   return <div className="posView" dir="rtl">
     <div className="posSummary">
-      <div className="summaryBox summaryQty"><div className="summaryIcon"><Banknote /></div><div><span>إجمالي الكمية</span><strong>{totalQty}</strong><small>قطعة</small></div></div>
-      <div className="summaryTotal"><span>المجموع الكلي</span><strong>{money(total)} <small>دج</small></strong></div>
+      <div className="summaryTotal"><strong>{money(total)} <small>دج</small></strong></div>
       <div className="summaryBox summaryProducts"><div className="summaryIcon"><ShoppingCart /></div><div><span>عدد المنتجات</span><strong>{cart.length}</strong><small>منتجات</small></div></div>
     </div>
 
-    <div className="cartTabs">
-      <div className="cartSelector">
-        <button className="cartSelectorButton" onClick={() => setCartMenuOpen(v => !v)}><ShoppingCart size={24} /><div className="cartSelectorText"><small>نقطة البيع</small><b>{activeCartLabel}</b></div><span>{totalQty}</span><ChevronDown className={cartMenuOpen ? "rotated" : ""} /></button>
-        {cartMenuOpen && <div className="cartMenu">
-          <div className="cartMenuHeader"><strong>السلات المفتوحة</strong><small>اختر السلة التي تريد العمل عليها</small></div>
-          {carts.map((c, i) => <button key={i} className={i === activeCart ? "cartMenuItem active" : "cartMenuItem"} onClick={() => switchCart(i)}><span className="cartMenuIcon"><ShoppingCart size={17} /></span><span className="cartMenuName">{i === 0 ? "السلة الحالية" : `سلة ${i + 1}`}</span><small>{c.length ? `${c.length} منتجات` : "فارغة"}</small><b>{c.reduce((s, x) => s + x.quantity, 0)}</b></button>)}
-        </div>}
-      </div>
-      <button className="newCartTab" onClick={startNewCart}><Plus /> سلة جديدة</button>
-    </div>
-
-    <div className="posMain">
+<div className="posMain">
       <section className="posLeft">
+        <div className="cartTabs">
+          {carts.slice(0, 5).map((c, i) => (
+            <button
+              key={i}
+              type="button"
+              className={i === activeCart ? "cartTab active" : "cartTab"}
+              onClick={() => switchCart(i)}
+              aria-label={`السلة ${i + 1}`}
+            >
+              {i + 1}
+            </button>
+          ))}
+        </div>
+
         <div className="searchRow"><button className="barcodeBtn" onClick={openBarcodeModal}><Barcode size={27} /> باركود</button><div className="posSearch"><input ref={barcodeInputRef} autoFocus value={query} onChange={handleBarcodeChange} onKeyDown={handleBarcodeKeyDown} placeholder="إبحث باسم السلعة أو الكود أو الباركود" /><Search size={25} /></div></div>
-        <div className="productResults">{filtered.map(p => <button className="posProduct" key={p.id} onClick={() => add(p)} disabled={Number(p.stock) <= 0}><strong>{p.name}</strong><small>{p.barcode}</small><span>{money(p.price)} دج</span><em>{p.stock > 0 ? `متوفر: ${p.stock}` : "نافد"}</em></button>)}</div>
+        <div className={query.trim() ? "productResults show" : "productResults"}>{filtered.map(p => <div className="posProduct" key={p.id}><button type="button" className={isFavorite(p) ? "posProductStar active" : "posProductStar"} onClick={e => { e.stopPropagation(); toggleFavorite(p); }} aria-label="إضافة للمفضلة"><Star size={15} fill={isFavorite(p) ? "currentColor" : "none"} /></button><button type="button" className="posProductBody" onClick={() => add(p)} disabled={Number(p.stock) <= 0}><strong>{p.name}</strong><small>{p.barcode}</small><span>{money(p.price)} دج</span><em>{p.stock > 0 ? `متوفر: ${p.stock}` : "نافد"}</em></button></div>)}</div>
         <div className="cartTable">
           <div className="cartTableHead"><span>#</span><span>السلعة</span><span>السعر</span><span>الكمية</span><span>الإجمالي</span><span>إجراءات</span></div>
           {cart.length ? cart.map((i, index) => <div className={index === selectedIndex ? "cartRow selected" : "cartRow"} key={i.id} onClick={() => setSelectedIndex(index)}><span>{index + 1}</span><div className="cartProduct"><strong>{i.name}</strong><small>{i.barcode}</small></div><span>{money(i.price)} دج</span><div className="qtyControls"><button onClick={e => { e.stopPropagation(); changeQty(i.id, -1); }}><Minus /></button><b>{i.quantity}</b><button onClick={e => { e.stopPropagation(); changeQty(i.id, 1); }}><Plus /></button></div><strong>{money(i.price * i.quantity)} دج</strong><button className="deleteRow" onClick={e => { e.stopPropagation(); remove(i.id); setSelectedIndex(-1); }}><Trash2 /></button></div>) : <div className="cartEmpty"><ShoppingCart size={42} /><span>السلة فارغة</span><small>امسح باركود المنتج أو اختر سلعة لإضافتها</small></div>}
@@ -296,9 +347,54 @@ export default function POSView() {
         </div>
       </section>
 
-      <aside className="paymentPanel">
+        <aside className="paymentPanel">
+
+  <div className="posTopBar">
+    <div className="posTopBarRow">
+
+      <button
+        type="button"
+        className="posTopBtn"
+        onClick={handleTopPrint}
+      >
+        <Printer size={16} />
+        طباعة
+      </button>
+
+      <button
+        type="button"
+        className="posTopBtn"
+        onClick={openAddCustomer}
+      >
+        <UserPlus size={16} />
+        إضافة عميل
+      </button>
+
+    </div>
+
+    <button
+      type="button"
+      className="posTopBtn posExitBtn"
+      onClick={handleExitPOS}
+    >
+      <LogOut size={16} />
+      الخروج من نقطة البيع
+    </button>
+  </div>
+
+  <div className="paymentTitle">
+
+  </div>
         <div className="paymentTitle"><h2>تفاصيل البيع</h2><Banknote /></div>
         <div className="payLine"><span>المجموع الكلي</span><strong>{money(total)} دج</strong></div>
+
+        <section className="posFavorites">
+          <div className="posFavoritesHeader"><strong>المفضلة</strong><Star size={15} fill="currentColor" /></div>
+          {favoriteProducts.length
+            ? <div className="posFavoritesGrid">{favoriteProducts.map(p => <div className="posFavoriteCard" key={p.id}><button type="button" className="posFavoriteMain" onClick={() => add(p)} disabled={Number(p.stock) <= 0}><strong>{p.name}</strong><b>{money(p.price)} دج</b></button><button type="button" className="posFavoriteStar" onClick={() => toggleFavorite(p)} aria-label="إزالة من المفضلة"><Star size={12} fill="currentColor" /></button></div>)}</div>
+            : <div className="posFavoritesEmpty">اضغط ⭐ على أي سلعة في نتائج البحث لإضافتها هنا</div>}
+        </section>
+
         <label className="customerField"><UserRound size={16} /><span>العميل</span><select value={customer} onChange={e => setCustomer(e.target.value)}>{customers.map(c => <option key={c.id || c.name} value={c.name}>{c.name}</option>)}</select><ChevronDown size={16} /></label>
         <button className="completeBtn" onClick={complete} disabled={!cart.length}><CheckCircle2 size={22} /> إتمام البيع</button>
         {message && <div className="posMessage">{message}</div>}
@@ -333,6 +429,17 @@ export default function POSView() {
           </div>
           <div className="barcodeEditActions"><button type="button" className="barcodeCancelEdit" onClick={() => setBarcodeEditMode(false)}>إلغاء</button><button type="submit" className="barcodeSaveEdit"><Save size={18} /> حفظ التعديل</button></div>
         </form>}
+      </div>
+    </div>}
+
+    {customerModalOpen && <div className="customerOverlay" role="dialog" aria-modal="true" aria-labelledby="customerDialogTitle" onMouseDown={e => { if (e.target === e.currentTarget) setCustomerModalOpen(false); }}>
+      <div className="customerModal">
+        <button className="customerModalClose" onClick={() => setCustomerModalOpen(false)} aria-label="إغلاق"><X size={20} /></button>
+        <div className="customerModalHeader"><span className="customerModalIcon"><UserPlus size={22} /></span><h3 id="customerDialogTitle">إضافة عميل جديد</h3></div>
+        <form onSubmit={saveNewCustomer}>
+          <label className="customerModalLabel">اسم العميل<input autoFocus required value={newCustomerName} onChange={e => setNewCustomerName(e.target.value)} placeholder="مثال: أحمد بن علي" /></label>
+          <div className="customerModalActions"><button type="button" className="customerCancelBtn" onClick={() => setCustomerModalOpen(false)}>إلغاء</button><button type="submit" className="customerSaveBtn"><Save size={16} /> حفظ العميل</button></div>
+        </form>
       </div>
     </div>}
 

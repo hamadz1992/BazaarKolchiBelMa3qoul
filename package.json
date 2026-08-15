@@ -14,23 +14,35 @@
   },
   "dependencies": {
     "@vitejs/plugin-react": "^4.4.1",
-    "vite": "^6.3.5",
+    "lucide-react": "^0.468.0",
+    "pdf-to-printer": "^5.8.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "lucide-react": "^0.468.0",
-    "pdf-to-printer": "^5.8.0"
+    "vite": "^6.3.5"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",
-    "electron": "^37.2.6",
+    "electron": "^37.10.3",
     "electron-builder": "^26.0.12",
     "wait-on": "^8.0.3"
   },
   "build": {
     "appId": "com.belma3qoul.bazaar",
     "productName": "بزار كل شيء بالمعقول",
-    "directories": { "output": "release" },
-    "files": ["dist/**/*", "electron/**/*", "package.json"],
-    "win": { "target": "nsis", "artifactName": "BazaarKolchiBelMa3qoul-Setup-${version}.${ext}" }
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis",
+      "artifactName": "BazaarKolchiBelMa3qoul-Setup-${version}.${ext}"
+    }
+  },
+  "allowScripts": {
+    "electron@37.10.3": true
   }
 }
