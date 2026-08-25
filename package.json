@@ -51,7 +51,7 @@
       "dist/**/*",
       "electron/**/*",
       "package.json",
-      ".env",
+
       "server/**/*"
     ],
     "win": {

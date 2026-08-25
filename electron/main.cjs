@@ -45,12 +45,14 @@ async function startApiServer() {
     }
 
     const apiRoot = path.dirname(path.dirname(script));
-    const env = {
-      ...process.env,
-      PORT: String(process.env.PORT || 8787),
-      ELECTRON_RUN_AS_NODE: '1',
-      DOTENV_CONFIG_PATH: path.join(apiRoot, '.env')
-    };
+   const env = {
+  ...process.env,
+  PORT: String(process.env.PORT || 8787),
+  ELECTRON_RUN_AS_NODE: '1',
+  DOTENV_CONFIG_PATH: app.isPackaged
+    ? path.join(app.getPath('userData'), '.env')
+    : path.join(apiRoot, '.env')
+};
 
     apiProcess = spawn(process.execPath, [script], {
       cwd: apiRoot,
