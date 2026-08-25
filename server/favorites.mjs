@@ -1,0 +1,3 @@
+import {query} from './db.mjs';
+export async function listFavorites(userId){return (await query(`SELECT p.* FROM favorite_products f JOIN products p ON p.id=f.product_id WHERE f.user_id=$1 AND p.active=true ORDER BY f.created_at DESC`,[userId])).rows;}
+export async function toggleFavorite(userId,productId){const r=await query(`DELETE FROM favorite_products WHERE user_id=$1 AND product_id=$2 RETURNING product_id`,[userId,productId]);if(r.rowCount)return {favorite:false};await query(`INSERT INTO favorite_products(user_id,product_id) VALUES($1,$2) ON CONFLICT DO NOTHING`,[userId,productId]);return {favorite:true};}

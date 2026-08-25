@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#17324d">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="mobile.css?v=20260822-4">
+  <title>بزار كل شيء بالمعقول</title>
+</head>
+<body>
+<div id="loginView" class="shell loginShell">
+  <div class="brand"><div class="brandMark">ب</div><h1>بزار كل شيء بالمعقول</h1><p>إدارة متجرك من الهاتف</p></div>
+  <section class="card loginCard">
+    <h2>تسجيل الدخول</h2>
+    <div class="formStack">
+      <label>اسم المستخدم<input id="username" autocomplete="username" placeholder="اسم المستخدم"></label>
+      <label>كلمة المرور<input id="password" autocomplete="current-password" type="password" inputmode="numeric" pattern="\d{6}" maxlength="6" placeholder="6 أرقام"></label>
+      <button id="loginBtn" class="primary bigBtn" type="button">دخول</button>
+    </div>
+    <div id="loginStatus" class="status" role="status" aria-live="polite"></div>
+    <div class="loginHint">كلمة المرور تتكون من 6 أرقام.</div>
+  </section>
+</div>
+
+<div id="appView" class="appShell" hidden>
+  <header class="topbar">
+    <div class="topBrand"><div class="miniMark">ب</div><div><strong>بزار</strong><small id="userLabel">متصل</small></div></div>
+    <div class="top-actions"><span id="online" class="pill">...</span><button id="syncBtn" class="iconBtn" type="button" title="مزامنة">↻</button><button id="logoutBtn" class="iconBtn ghost" type="button" title="خروج">⎋</button></div>
+  </header>
+
+  <main class="content">
+    <section id="homeScreen" class="screen">
+      <div class="welcome card"><div><span class="eyebrow">لوحة المتجر</span><h2>م</h2><p class="subtle">كل ما تحتاجه لإدارة البيع والمخزون والعملاء من مكان واحد.</p></div><div class="homeBadge">اليوم</div></div>
+      <div class="statsGrid">
+        <button class="statCard" data-tab="saleScreen"><span>🧾</span><small>المبيعات</small><strong id="statSales">0</strong><em>عملية</em></button>
+        <button class="statCard" data-tab="inventoryScreen"><span>📦</span><small>المنتجات</small><strong id="statProducts">0</strong><em>منتج</em></button>
+        <button class="statCard" data-tab="customersScreen"><span>👥</span><small>العملاء</small><strong id="statCustomers">0</strong><em>عميل</em></button>
+        <button class="statCard" data-tab="moreScreen"><span>💰</span><small>الصندوق</small><strong id="statCash">—</strong><em>الرصيد</em></button>
+      </div>
+      <div class="card quickCard"><div class="sectionTitle"><span class="sectionIcon">⚡</span><h3>الوصول السريع</h3></div><div class="quickGrid"><button class="quickBtn primary" data-tab="saleScreen">بيع جديد</button><button class="quickBtn" data-tab="inventoryScreen">المخزون</button><button class="quickBtn" data-tab="customersScreen">العملاء</button><button class="quickBtn" data-tab="moreScreen">المزيد</button></div></div>
+      <div class="card syncCard"><div><b>حالة المزامنة</b><p id="syncInfo" class="subtle">جاهز</p></div><span class="queueBadge">الطابور: <b id="queueCount">0</b></span></div>
+    </section>
+
+    <section id="saleScreen" class="screen saleScreen" hidden>
+      <div class="posTopActions">
+        <button id="clearCartBtn" class="posAction dangerAction" type="button"><span>⌫</span>مسح السلة</button>
+        <button id="todayInvoicesBtn" class="posAction" type="button"><span>▤</span>فواتير اليوم <b id="todayInvoiceCount">0</b></button>
+      </div>
+      <div class="posSearch card">
+        <input id="productSearch" placeholder="ابحث عن منتج أو باركود" autocomplete="off">
+        <button id="barcodeBtn" class="cameraBtn" type="button" title="فتح الكاميرا">⌁</button>
+      </div>
+      <div id="productsList" class="posSearchResults"></div>
+      <div class="posCart card">
+        <div id="cartList" class="cart"></div>
+        <div id="cartEmpty" class="posEmpty">السلة فارغة. إبحث عن منتج لإضافته.</div>
+      </div>
+      <div class="posCheckout card">
+        <div class="posSummary"><div><span>الإجمالي</span><strong id="cartTotal">0 دج</strong></div><div><span>المنتجات</span><strong id="cartCount">0</strong></div></div>
+        <button id="saleBtn" class="completeSaleBtn" type="button">إتمام البيع</button>
+      </div>
+    </section>
+
+    <section id="todayInvoicesScreen" class="screen invoiceScreen" hidden>
+      <div class="invoiceHeader"><button id="invoiceBackBtn" class="plainBack" type="button">‹</button><div><h2>فواتير اليوم</h2></div><span id="invoiceCountLabel" class="invoiceCountLabel">0 فاتورة</span></div>
+      <div id="todayInvoicesList" class="invoiceList"></div>
+    </section>
+
+    <section id="invoiceDetailScreen" class="screen invoiceDetailScreen" hidden>
+      <div class="invoiceDetailTop"><button id="invoiceDetailBackBtn" class="plainBack" type="button">‹</button><h2>تفاصيل الفاتورة</h2></div>
+      <div id="invoiceDetailCard" class="invoicePaper"></div>
+      <div class="invoiceActions"><button id="printInvoiceBtn" class="primary bigBtn" type="button">🖨️ طباعة</button><button id="continueSaleBtn" class="bigBtn" type="button">متابعة بدون طباعة</button></div>
+    </section>
+
+
+    <div id="quantityModal" class="quantityModal" hidden>
+      <div class="quantityPanel">
+        <div class="scannerHead"><strong>تعديل الكمية</strong><button id="closeQuantityBtn" type="button">×</button></div>
+        <div class="quantityProductName" id="quantityProductName"></div>
+        <label class="quantityLabel">الكمية<input id="quantityInput" type="number" min="1" step="1" inputmode="numeric" placeholder="أدخل الكمية"></label>
+        <button id="saveQuantityBtn" class="primary bigBtn" type="button">حفظ الكمية</button>
+      </div>
+    </div>
+    <div id="paymentModal" class="paymentModal" hidden>
+      <div class="paymentPanel">
+        <div class="scannerHead"><strong>إتمام البيع</strong><button id="closePaymentBtn" type="button">×</button></div>
+        <div class="formStack">
+          <select id="saleCustomer"></select><div class="invoiceTypeHint">الفاتورة: <b>زبون</b> إذا لم تختر عميلاً، و<b>عميل</b> عند اختيار عميل مسجل.</div>
+          <div class="grid2"><input id="salePaid" type="number" min="0" step="0.01" placeholder="المدفوع"><input id="saleDiscount" type="number" min="0" step="0.01" placeholder="الخصم"></div>
+          <select id="saleMethod"><option value="cash">نقدي</option><option value="card">بطاقة</option><option value="credit">دين</option></select>
+          <button id="confirmSaleBtn" class="primary bigBtn" type="button">تأكيد البيع</button>
+        </div>
+      </div>
+    </div>
+    <div id="scannerModal" class="scannerModal" hidden>
+      <div class="scannerPanel">
+        <div class="scannerHead"><strong>مسح الباركود</strong><button id="closeScannerBtn" type="button">×</button></div>
+        <video id="scannerVideo" autoplay playsinline muted></video>
+        <p id="scannerHint" class="subtle">وجّه الكاميرا نحو الباركود.</p>
+      </div>
+    </div>
+
+    <section id="customersScreen" class="screen" hidden>
+      <div class="sectionBar"><div><span class="eyebrow">العلاقات</span><h2>العملاء</h2></div></div>
+      <div class="card"><input id="customerSearch" placeholder="بحث باسم العميل أو الهاتف"><div id="customersList" class="list"></div></div>
+      <div class="splitCards"><div class="card"><h3>إضافة عميل</h3><div class="formStack"><input id="newCustomerName" placeholder="اسم العميل"><input id="newCustomerPhone" placeholder="الهاتف"><button id="newCustomerBtn" class="primary" type="button">حفظ العميل</button></div></div>
+      <div class="card"><h3>دفعة دين</h3><div class="formStack"><select id="paymentCustomer"></select><input id="paymentAmount" type="number" step="1" inputmode="decimal" placeholder="المبلغ"><input id="paymentNote" placeholder="ملاحظة"><button id="paymentBtn" class="primary" type="button">تسجيل الدفعة</button></div></div></div>
+      <div class="card"><div class="sectionTitle"><span class="sectionIcon">💳</span><h3>المدينون</h3></div><div id="debtorsList" class="list"></div></div>
+    </section>
+
+    <section id="inventoryScreen" class="screen" hidden>
+      <div class="sectionBar"><div><span class="eyebrow">المخزون</span><h2>المنتجات والمخزون</h2></div><div><span class="countBadge" id="inventoryCount">0</span><button id="addProductBtn" class="primary" type="button">+ سلعة</button></div></div>
+      <div id="productForm" class="card" hidden>
+        <div class="sectionTitle"><span class="sectionIcon">📦</span><h3 id="productFormTitle">إضافة سلعة</h3></div>
+        <div class="formStack">
+          <input id="productName" placeholder="اسم السلعة">
+          <input id="productBarcode" placeholder="الباركود">
+          <div class="grid2"><input id="productPurchase" type="number" min="0" step="0.01" placeholder="سعر الشراء"><input id="productSale" type="number" min="0" step="0.01" placeholder="سعر البيع"></div>
+          <div class="grid2"><input id="productStock" type="number" min="0" step="1" placeholder="المخزون"><input id="productMinimum" type="number" min="0" step="1" placeholder="الحد الأدنى"></div>
+          <div class="grid2"><select id="productCategory"><option value="">بدون تصنيف</option></select><select id="productUnit"><option value="">بدون وحدة</option></select></div>
+          <div class="grid2"><button id="productSaveBtn" class="primary bigBtn" type="button">حفظ السلعة</button><button id="cancelProductBtn" class="bigBtn" type="button">إلغاء</button></div>
+        </div>
+      </div>
+      <div class="card excelCard">
+        <div class="sectionTitle"><span class="sectionIcon">📊</span><h3>Excel</h3></div>
+        <input id="excelFile" type="file" accept=".xlsx" hidden>
+        <div class="grid2"><button id="excelPickBtn" class="bigBtn" type="button">اختيار ملف Excel</button><button id="excelImportBtn" class="primary bigBtn" type="button" disabled>استيراد</button></div>
+        <p id="excelFileName" class="subtle">لم يتم اختيار ملف.</p>
+        <div id="excelPreview" class="subtle"></div>
+      </div>
+      <div class="card"><input id="inventorySearch" placeholder="بحث في المخزون"><div id="productsListInventory" class="list"></div></div>
+    </section>
+
+    <section id="moreScreen" class="screen" hidden>
+      <div class="sectionBar"><div><span class="eyebrow">إدارة</span><h2>المزيد</h2></div></div>
+      <div class="moreGrid">
+        <div class="card"><div class="sectionTitle"><span class="sectionIcon">🧾</span><h3>آخر المبيعات</h3></div><div id="salesList" class="list"></div></div>
+        <div class="card"><div class="sectionTitle"><span class="sectionIcon">💰</span><h3>الصندوق</h3></div><p id="cashInfo" class="cashValue">—</p></div>
+        <div class="card"><div class="sectionTitle"><span class="sectionIcon">💸</span><h3>المصاريف</h3></div><div class="formStack"><input id="expenseDescription" placeholder="وصف المصروف"><input id="expenseAmount" type="number" step="1" inputmode="decimal" placeholder="المبلغ"><button id="expenseBtn" class="primary" type="button">حفظ المصروف</button></div><div id="expensesList" class="list"></div></div>
+        <div class="card"><div class="sectionTitle"><span class="sectionIcon">⭐</span><h3>المفضلة</h3></div><div id="favoritesList" class="list"></div></div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottomNav">
+    <button data-tab="homeScreen" class="tab active"><span>⌂</span><small>الرئيسية</small></button>
+    <button data-tab="saleScreen" class="tab"><span>🛒</span><small>البيع</small></button>
+    <button data-tab="customersScreen" class="tab"><span>👥</span><small>العملاء</small></button>
+    <button data-tab="inventoryScreen" class="tab"><span>📦</span><small>المخزون</small></button>
+    <button data-tab="moreScreen" class="tab"><span>☰</span><small>المزيد</small></button>
+  </nav>
+  <div id="status" class="status"></div>
+</div>
+<script src="config.js"></script>
+<script src="mobile.js?v=20260822-payment-modal-fix-final"></script>
+</body>
+</html>

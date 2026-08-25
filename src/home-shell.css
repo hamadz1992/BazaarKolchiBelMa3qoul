@@ -1,0 +1,385 @@
+:root{
+  --home-bg:#f7fbff;
+  --home-card:#ffffff;
+  --home-ink:#102a52;
+  --home-muted:#6d7d96;
+  --home-accent:#1677ff;
+  --home-border:#e5edf7;
+}
+html,body,#root{width:100%;height:100%;margin:0}
+.homeShell{
+  width:100%;
+  height:100%;
+  min-height:100vh;
+  direction:rtl;
+  background:
+    radial-gradient(600px 420px at 100% 0%,rgba(71,151,255,.08),transparent 70%),
+    radial-gradient(500px 340px at 0% 100%,rgba(104,183,255,.06),transparent 70%),
+    linear-gradient(180deg,#fbfdff 0%,#f2f7fc 100%);
+  color:var(--home-ink);
+  overflow:hidden;
+  position:relative;
+}
+.homeShell::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  opacity:.45;
+  background:
+    radial-gradient(circle at 92% 14%,rgba(38,121,255,.12) 0 2px,transparent 2.5px) 0 0/18px 18px,
+    radial-gradient(900px 500px at -5% 10%,transparent 55%,rgba(213,230,248,.48) 55.2%,transparent 56%);
+}
+.homeStage{
+  width:min(1450px,calc(100% - 72px));
+  height:100%;
+  margin:0 auto;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:26px 0 28px;
+  box-sizing:border-box;
+  position:relative;
+  z-index:1;
+}
+.homeHero{
+  display:grid;
+  grid-template-columns:minmax(520px,1.05fr) minmax(560px,1fr);
+  align-items:center;
+  gap:34px;
+  margin-bottom:28px;
+  direction:ltr;
+}
+.homeHeroGreeting{
+  justify-content:center;
+  text-align:center;
+  min-width:0;
+}
+.homeGreeting{
+  width:100%;
+  font-size:25px;
+  line-height:1.35;
+  font-weight:850;
+  color:#102a52;
+  text-align:center;
+  letter-spacing:-.35px;
+}
+.homeGreetingMark{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+  margin-top:14px;
+}
+.homeGreetingMark span{display:block;width:66px;height:5px;border-radius:99px;background:#1677ff}
+.homeGreetingMark i{display:block;width:8px;height:8px;border-radius:50%;background:#1677ff}
+.homeSettingsButton{
+  display:none;
+}
+.homeStatus{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+  direction:ltr;
+  min-width:0;
+}
+.homeStatusCard{
+  min-height:72px;
+  background:rgba(255,255,255,.92);
+  border:1px solid var(--home-border);
+  border-radius:15px;
+  padding:9px 11px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  direction:rtl;
+  box-shadow:0 5px 18px rgba(22,66,111,.055);
+  min-width:0;
+}
+.homeStatusIcon{
+  width:40px;height:40px;border-radius:12px;
+  display:grid;place-items:center;flex:none;
+}
+.homeStatusIcon.homeStatusBlue{background:#edf5ff;color:#1677ff}
+.homeStatusIcon.homeStatusPurple{background:#f1edff;color:#6347e8}
+.homeStatusIcon.homeStatusGreen{background:#e9faf4;color:#10a77b;position:relative}
+.homeStatusCard span:last-child{min-width:0;display:flex;flex-direction:column;align-items:flex-start}
+.homeStatusCard small{font-size:11px;color:#71809a;line-height:1.2;white-space:nowrap}
+.homeStatusCard strong{font-size:13px;color:#18345d;line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.homeStatusCard strong.online{color:#10a77b}
+.homeStatusCard strong.offline{color:#e34d59}
+.homeClock{font-variant-numeric:tabular-nums;direction:ltr}
+.homePulse{
+  position:absolute;
+  width:8px;height:8px;border-radius:50%;
+  background:#18bf83;
+  top:5px;right:5px;
+  border:2px solid #e9faf4;
+}
+.homeGrid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:18px 18px;
+}
+.homeCard{
+  position:relative;
+  min-height:150px;
+  border:1px solid var(--home-border);
+  background:rgba(255,255,255,.96);
+  border-radius:17px;
+  padding:25px 25px 22px;
+  text-align:right;
+  display:flex;
+  flex-direction:row;
+  align-items:flex-start;
+  justify-content:flex-start;
+  gap:18px;
+  cursor:pointer;
+  box-shadow:0 7px 22px rgba(28,75,125,.065);
+  transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease;
+  overflow:hidden;
+}
+.homeCard::after{
+  content:"";
+  position:absolute;
+  width:180px;height:180px;
+  left:-88px;bottom:-104px;
+  border-radius:50%;
+  border:26px solid rgba(22,119,255,.035);
+  pointer-events:none;
+}
+.homeCard:hover{
+  transform:translateY(-2px);
+  box-shadow:0 13px 30px rgba(28,75,125,.11);
+  border-color:#c9ddf7;
+}
+.homeCardIcon{
+  width:62px;height:62px;border-radius:14px;
+  background:#edf5ff;
+  display:grid;place-items:center;
+  color:#1677ff;
+  flex:none;
+  position:relative;z-index:2;
+}
+.homeCardText{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  padding-top:3px;
+}
+.homeCard strong{
+  font-size:17px;
+  line-height:1.25;
+  font-weight:850;
+  color:#102a52;
+  white-space:nowrap;
+}
+.homeCard small{
+  margin-top:7px;
+  font-size:12px;
+  color:#71809a;
+  white-space:nowrap;
+}
+.homeCardWatermark{
+  position:absolute;
+  left:20px;
+  bottom:10px;
+  color:#eaf0f8;
+  opacity:.95;
+  z-index:0;
+}
+.homeCardArrow{
+  position:absolute;
+  right:auto;
+  left:18px;
+  bottom:22px;
+  width:34px;height:34px;
+  border-radius:50%;
+  background:#f3f7fc;
+  color:#19385f;
+  display:grid;
+  place-items:center;
+  z-index:3;
+}
+.homeCardAccent{
+  border:2px solid #1677ff;
+  box-shadow:0 7px 24px rgba(22,119,255,.12);
+}
+.homeCardAccent .homeCardIcon{background:#e7f1ff;color:#1677ff}
+.homeCardAccent .homeCardArrow{background:#eaf3ff;color:#1677ff}
+/* Subtle per-module icon palette, matching the reference */
+.homeCard:nth-child(2) .homeCardIcon{background:#f0edff;color:#5f35dc}
+.homeCard:nth-child(3) .homeCardIcon{background:#edf5ff;color:#1677ff}
+.homeCard:nth-child(4) .homeCardIcon{background:#edf5ff;color:#1677ff}
+.homeCard:nth-child(5) .homeCardIcon{background:#e7faf5;color:#0aa984}
+.homeCard:nth-child(6) .homeCardIcon{background:#fff3e6;color:#f28b14}
+.homeCard:nth-child(7) .homeCardIcon{background:#fff0f1;color:#e33b3f}
+.homeCard:nth-child(8) .homeCardIcon{background:#eafafa;color:#13a8a6}
+.homeCard:nth-child(9) .homeCardIcon{background:#f1edff;color:#6338dc}
+.homeCard:nth-child(10) .homeCardIcon{background:#edf5ff;color:#1677ff}
+.homeCard:nth-child(11) .homeCardIcon{background:#edf5ff;color:#1677ff}
+.fullViewStage{width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden}
+.fullViewHeader{height:56px;min-height:56px;background:#102a52;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 20px;box-sizing:border-box}
+.backHome{border:0;background:#fff;color:#102a52;border-radius:10px;height:36px;padding:0 13px;display:inline-flex;align-items:center;gap:5px;font:800 13px/1 inherit;cursor:pointer}
+.fullViewTitle{display:flex;align-items:center;gap:12px;min-width:0}.fullViewTitle strong{font-size:16px;white-space:nowrap}.fullViewTitle span{font-size:11px;color:#b9c8dc}
+.fullViewBody{flex:1;min-height:0;overflow:auto;background:#fff;padding:16px 18px 20px;box-sizing:border-box}
+.fullViewBody>.title:first-child{margin-top:0}
+@media(max-width:1250px){
+  .homeStage{width:min(1120px,calc(100% - 42px))}
+  .homeHero{grid-template-columns:minmax(440px,1fr) minmax(430px,1fr);gap:18px}
+  .homeStatus{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .homeCard strong{font-size:17px}
+}
+@media(max-width:900px){
+  .homeStage{width:calc(100% - 24px);padding:18px 0 22px;overflow:auto}
+  .homeShell{overflow:auto}
+  .homeHero{display:flex;align-items:center;flex-direction:column;gap:15px;margin-bottom:18px}
+  .homeHeroGreeting{order:1;width:100%}
+  .homeStatus{order:2;width:100%;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .homeGreeting{font-size:22px}
+  .homeGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+  .homeCard{min-height:128px;border-radius:14px;padding:18px}
+  .homeCardIcon{width:54px;height:54px}
+}
+@media(max-width:560px){
+  .homeStatus{grid-template-columns:1fr}
+  .homeGrid{grid-template-columns:1fr}
+  .homeGreeting{font-size:21px}
+}
+/* POS is a dedicated screen and remains full-window; home shell does not style it. */
+body:has(.posView){overflow:hidden}
+
+/* Compact data tables: smaller row height, controls and internal spacing. */
+.fullViewBody table{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0;
+  font-size:12px;
+  line-height:1.15;
+}
+.fullViewBody thead th{
+  padding:6px 8px !important;
+  height:30px;
+  font-size:11px !important;
+  line-height:1.1;
+  white-space:nowrap;
+}
+.fullViewBody tbody td{
+  padding:5px 8px !important;
+  height:34px;
+  font-size:12px !important;
+  line-height:1.15;
+  vertical-align:middle;
+}
+.fullViewBody tbody tr{
+  height:34px;
+}
+.fullViewBody table button{
+  min-width:28px !important;
+  width:28px;
+  height:28px !important;
+  padding:0 !important;
+  border-radius:7px !important;
+}
+.fullViewBody table input,
+.fullViewBody table select{
+  min-height:30px !important;
+  height:30px !important;
+  padding:3px 7px !important;
+  font-size:12px !important;
+}
+.fullViewBody :is(.customerTable,.productsTable,.inventoryTable,.salesTable,.movementsTable){
+  font-size:12px;
+}
+.fullViewBody :is(.customerTable th,.productsTable th,.inventoryTable th,.salesTable th,.movementsTable th){
+  padding-block:6px !important;
+}
+.fullViewBody :is(.customerTable td,.productsTable td,.inventoryTable td,.salesTable td,.movementsTable td){
+  padding-block:5px !important;
+}
+.fullViewBody :is(.customerTableWrap,.productsTableWrap,.inventoryTableWrap,.salesTableWrap,.movementsTableWrap){
+  max-height:none;
+  overflow-x:auto;
+  scrollbar-width:none;
+}
+.fullViewBody :is(.customerTableWrap,.productsTableWrap,.inventoryTableWrap,.salesTableWrap,.movementsTableWrap)::-webkit-scrollbar{display:none}
+.fullViewBody .pagination,
+.fullViewBody .pager,
+.fullViewBody [class*="Pagination"]{
+  margin-top:8px !important;
+  padding-top:4px !important;
+  padding-bottom:4px !important;
+}
+@media(max-width:860px){
+  .fullViewBody thead th{padding:5px 6px !important;font-size:10.5px !important}
+  .fullViewBody tbody td{padding:4px 6px !important;height:31px;font-size:11px !important}
+  .fullViewBody tbody tr{height:31px}
+}
+
+/* Full-screen modules: the module title is already shown in .fullViewHeader.
+   Keep only secondary content/actions inside the module headers. */
+.fullViewBody .productsHeader > div:first-child,
+.fullViewBody .inventoryHeader > div:first-child,
+.fullViewBody .movementsHeader > div:first-child,
+.fullViewBody .salesHeader > div:first-child,
+.fullViewBody .cashHeader > div:first-child,
+.fullViewBody .usersHeader > div:first-child,
+.fullViewBody .permissionsHeader > div:first-child,
+.fullViewBody .reportsHeader > div:first-child,
+.fullViewBody .barcodeTitleRow > div:last-child,
+.fullViewBody .catalogTitleRow > div:last-child,
+.fullViewBody .productsHeaderActions + div,
+.fullViewBody .expensesHeader h1,
+.fullViewBody .expensesHeader p,
+.fullViewBody .settingsHeader,
+.fullViewBody .backupHeader,
+.fullViewBody .pmTitle > div:first-child,
+.fullViewBody .excelTitle > div:last-child {
+  display:none !important;
+}
+
+/* Keep the header rows compact when only actions/counts remain. */
+.fullViewBody .productsHeader,
+.fullViewBody .inventoryHeader,
+.fullViewBody .movementsHeader,
+.fullViewBody .salesHeader,
+.fullViewBody .cashHeader,
+.fullViewBody .usersHeader,
+.fullViewBody .permissionsHeader,
+.fullViewBody .reportsHeader,
+.fullViewBody .barcodeHeader,
+.fullViewBody .catalogHeader,
+.fullViewBody .expensesHeader,
+.fullViewBody .settingsHeader,
+.fullViewBody .backupHeader,
+.fullViewBody .pmTitle,
+.fullViewBody .productsHeaderActions {
+  min-height:44px !important;
+  margin-bottom:8px !important;
+  padding-top:0 !important;
+  padding-bottom:0 !important;
+  align-items:center !important;
+}
+
+/* When a title-only header has no remaining controls, remove its empty space. */
+.fullViewBody .settingsHeader:empty,
+.fullViewBody .backupHeader:empty {
+  display:none !important;
+}
+
+/* Keep customer report heading: it identifies the selected customer and is not a duplicate. */
+.fullViewBody .customerReportHead,
+.fullViewBody .customerReportPanelHead,
+.fullViewBody .customerReceiptHead,
+.fullViewBody .customerModalHead {
+  display:flex;
+}
+
+/* المصاريف: رفع المحتوى مباشرة أسفل الشريط العلوي بدون الفراغ المخصص للعنوان المخفي. */
+.fullViewBody .expensesHeader{
+  display:none !important;
+}
+.fullViewBody .expensesView{
+  margin-top:-16px !important;
+}

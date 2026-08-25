@@ -1,0 +1,11 @@
+{
+  "name": "بزار كل شيء بالمعقول",
+  "short_name": "بزار",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f3f5f8",
+  "theme_color": "#111827",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": []
+}

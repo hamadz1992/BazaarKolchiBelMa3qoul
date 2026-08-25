@@ -1,0 +1,55 @@
+/* نظرة عامة: 5 بطاقات فقط — بدون قيمة المخزون وبدون مبلغ الصندوق */
+.statsRow{
+  display:grid !important;
+  grid-template-columns:repeat(5,minmax(0,1fr)) !important;
+  gap:10px !important;
+  align-items:stretch;
+}
+.statsRow .stat{
+  min-width:0;
+  min-height:116px !important;
+  height:116px !important;
+  padding:10px 9px !important;
+  overflow:hidden;
+}
+.statsRow .statTitle{
+  min-width:0;
+  padding-inline:30px 6px !important;
+  font-size:11px !important;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.statsRow .statValue{
+  width:100%;
+  min-width:0;
+  font-size:clamp(13px,1.35vw,18px) !important;
+  line-height:1.05 !important;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:clip;
+}
+.statsRow .statUnit{font-size:9px !important}
+.statsRow .statNote{font-size:8.5px !important}
+.statsRow .link{font-size:9px !important}
+.statsRow .statIcon{width:32px !important;height:32px !important;top:8px !important;right:8px !important}
+
+/* keep the five cards inside the visible desktop workspace */
+.statsRow + .mainGrid{margin-top:8px !important}
+.mainGrid{gap:8px !important}
+.bottom{gap:8px !important}
+
+@media (max-width:1200px){
+  .statsRow{grid-template-columns:repeat(5,minmax(0,1fr)) !important;gap:7px !important}
+  .statsRow .statTitle{font-size:10px !important;padding-inline:28px 4px !important}
+  .statsRow .statValue{font-size:clamp(12px,1.3vw,16px) !important}
+}
+@media (max-width:900px){
+  .statsRow{grid-template-columns:repeat(3,minmax(0,1fr)) !important}
+}
+@media (max-width:650px){
+  .statsRow{grid-template-columns:repeat(2,minmax(0,1fr)) !important}
+}
+@media (max-width:430px){
+  .statsRow{grid-template-columns:1fr !important}
+}

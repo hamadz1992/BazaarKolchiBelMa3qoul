@@ -1,0 +1,213 @@
+.settingsView{padding-bottom:40px}.settingsHeader h1{display:flex;align-items:center;gap:10px;margin:0 0 8px;font-size:28px}.settingsHeader h1 svg{color:#e91e63}.settingsHeader p{margin:0 0 24px;color:#718096}.settingsGrid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.settingsCard{background:#fff;border:1px solid #dfe5ee;border-radius:14px;padding:24px;box-shadow:0 2px 8px rgba(16,35,61,.04)}.settingsCardHead{display:flex;align-items:flex-start;gap:12px;margin-bottom:22px}.settingsCardHead>svg{color:#e91e63;margin-top:2px}.settingsCardHead h2{margin:0 0 5px;font-size:18px}.settingsCardHead p{margin:0;color:#718096;font-size:13px}.settingsForm{display:grid;grid-template-columns:1fr 1fr;gap:16px}.settingsForm label,.invoiceFooter{display:flex;flex-direction:column;gap:7px;font-size:13px;color:#344054}.settingsForm .wide{grid-column:1/-1}.settingsForm input,.settingsForm select,.invoiceFooter textarea{height:42px;border:1px solid #d6deea;border-radius:8px;padding:0 12px;font-family:inherit;outline:0;background:#fff}.invoiceFooter textarea{height:100px;padding:12px;resize:vertical}.settingsActions{display:flex;align-items:center;gap:15px;margin-top:18px}.settingsActions button{border:0;background:#e91e63;color:#fff;border-radius:8px;padding:12px 18px;font-family:inherit;display:flex;align-items:center;gap:7px;cursor:pointer}.settingsActions span{color:#147a5a;font-size:14px}@media(max-width:800px){.settingsGrid{grid-template-columns:1fr}.settingsForm{grid-template-columns:1fr}.settingsForm .wide{grid-column:auto}}.updateCard{grid-column:1/-1}.updatePanel{display:grid;gap:14px}.updateCurrent{display:flex;align-items:center;justify-content:space-between;background:#f7f8fa;padding:12px 14px;border-radius:10px}.updateCurrent span{color:#6b7280}.updateCurrent strong{font-size:18px}.updatePanel>button{justify-self:start;display:inline-flex;align-items:center;gap:8px}.settingsMessage{padding:10px 12px;border-radius:8px;background:#f5f7fb}.rollbackBlock{display:grid;gap:10px}.rollbackHead{display:flex;align-items:center;gap:8px}.rollbackList{display:grid;gap:8px}.rollbackItem{display:flex;align-items:center;justify-content:space-between;border:1px solid #e5e7eb;padding:10px 12px;border-radius:10px}.rollbackItem>div{display:flex;flex-direction:column;gap:4px}.rollbackItem small{color:#6b7280}.rollbackItem button{display:inline-flex;align-items:center;gap:6px}.rollbackEmpty{color:#6b7280;padding:10px 0}
+
+
+/* =========================================================
+   الإعدادات العامة — تنسيق نهائي مرتب
+   ========================================================= */
+
+/* الحاوية العامة */
+.settingsView{
+  padding-bottom:18px;
+}
+
+.settingsGrid{
+  gap:14px !important;
+  align-items:stretch;
+}
+
+/* البطاقات العلوية */
+.settingsGrid > .settingsCard{
+  min-height:0 !important;
+  padding:15px 18px !important;
+  border-radius:11px !important;
+}
+
+.settingsGrid > .settingsCard:first-child,
+.settingsGrid > .settingsCard:nth-child(2){
+  height:295px;
+}
+
+.settingsCardHead{
+  margin-bottom:12px !important;
+  padding-bottom:8px;
+  border-bottom:1px solid #edf1f6;
+}
+
+.settingsCardHead h2{
+  font-size:17px !important;
+  line-height:1.2;
+}
+
+.settingsCardHead p{
+  font-size:10px !important;
+  line-height:1.4;
+}
+
+/* معلومات المحل: الحقول بشكل متوازن */
+.settingsForm{
+  gap:8px !important;
+}
+
+.settingsForm label{
+  font-size:11px !important;
+  line-height:1.2;
+}
+
+.settingsForm input,
+.settingsForm select{
+  height:36px !important;
+  border-radius:7px !important;
+  font-size:12px !important;
+}
+
+/* الفاتورة */
+.invoiceFooter{
+  font-size:11px !important;
+}
+
+.invoiceFooter textarea{
+  height:76px !important;
+  min-height:76px !important;
+  border-radius:7px !important;
+  font-size:12px !important;
+  line-height:1.5;
+  resize:none;
+}
+
+/* قسم التحديث: واضح لكن أقل فراغًا */
+.updateCard{
+  margin-top:0 !important;
+  padding:15px 18px !important;
+  border-radius:11px !important;
+}
+
+.updateCard .settingsCardHead{
+  margin-bottom:10px !important;
+}
+
+.updateCurrent{
+  min-height:48px !important;
+  padding:8px 12px !important;
+  border-radius:8px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+}
+
+.updateCurrent span{
+  font-size:11px !important;
+}
+
+.updateCurrent strong{
+  font-size:16px !important;
+}
+
+.updateActions{
+  display:flex !important;
+  align-items:center !important;
+  gap:8px !important;
+  margin-top:8px;
+  flex-wrap:wrap;
+}
+
+.updateActions button,
+.updatePanel > button{
+  height:34px !important;
+  padding:0 11px !important;
+  border-radius:7px !important;
+  font-size:11px !important;
+}
+
+/* آخر 3 إصدارات محفوظة */
+.rollbackBlock{
+  margin-top:8px;
+  padding-top:9px;
+  border-top:1px solid #edf1f6;
+}
+
+.rollbackHead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:7px;
+}
+
+.rollbackHead strong{
+  font-size:12px !important;
+}
+
+.rollbackList{
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+
+.rollbackItem{
+  min-height:38px !important;
+  padding:6px 8px !important;
+  border-radius:7px !important;
+}
+
+.rollbackItem strong{
+  font-size:11px !important;
+}
+
+.rollbackItem small{
+  font-size:9px !important;
+}
+
+.rollbackItem button{
+  height:29px !important;
+  padding:0 9px !important;
+  border-radius:6px !important;
+  font-size:10px !important;
+}
+
+.rollbackEmpty{
+  padding:6px 0 !important;
+  font-size:10px !important;
+}
+
+/* حفظ الإعدادات في مكان واضح وثابت */
+.settingsActions{
+  display:flex !important;
+  justify-content:flex-start !important;
+  align-items:center !important;
+  gap:8px !important;
+  margin-top:10px !important;
+}
+
+.settingsActions button{
+  height:36px !important;
+  padding:0 14px !important;
+  border-radius:7px !important;
+  font-size:12px !important;
+}
+
+.settingsActions span{
+  font-size:10px !important;
+}
+
+/* تقليل الفراغ الزائد أسفل الشاشة */
+.settingsGrid{
+  margin-bottom:0 !important;
+}
+
+@media (max-width:900px){
+  .settingsGrid > .settingsCard:first-child,
+  .settingsGrid > .settingsCard:nth-child(2){
+    height:auto;
+  }
+}
+
+@media (max-width:760px){
+  .settingsGrid{
+    grid-template-columns:1fr !important;
+  }
+
+  .settingsGrid > .settingsCard:first-child,
+  .settingsGrid > .settingsCard:nth-child(2){
+    height:auto;
+  }
+}

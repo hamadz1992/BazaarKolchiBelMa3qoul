@@ -1,0 +1,380 @@
+/* Global UI system — phase 1. POS is intentionally excluded because it has its own layout pass. */
+:root{
+  --ui-bg:#f4f6fa;
+  --ui-surface:#ffffff;
+  --ui-surface-muted:#f8fafc;
+  --ui-text:#101827;
+  --ui-muted:#667085;
+  --ui-subtle:#98a2b3;
+  --ui-border:#e4e7ec;
+  --ui-border-strong:#d0d5dd;
+  --ui-primary:#e91e63;
+  --ui-primary-dark:#b7184e;
+  --ui-focus:rgba(233,30,99,.14);
+  --ui-radius:12px;
+  --ui-radius-sm:9px;
+  --ui-shadow:0 3px 12px rgba(16,24,40,.06);
+  --ui-content-max:1680px;
+}
+
+/* Shell */
+.app{min-height:100vh;background:var(--ui-bg);overflow-x:hidden}
+.content{width:min(calc(100% - 212px),var(--ui-content-max));max-width:var(--ui-content-max);margin-right:212px;margin-left:auto;padding:26px clamp(18px,2vw,34px) 34px;min-width:0}
+.title{margin:0 0 20px}
+.title h1{font-size:clamp(21px,2vw,28px);line-height:1.25;font-weight:800}
+.title p{font-size:12px;color:var(--ui-muted);margin-top:6px}
+
+/* Consistent controls */
+.app button,
+.app input,
+.app select,
+.app textarea{font-family:inherit}
+.app button{min-height:40px;border-radius:var(--ui-radius-sm);transition:background-color .16s ease,border-color .16s ease,color .16s ease,box-shadow .16s ease,transform .08s ease}
+.app button:active:not(:disabled){transform:translateY(1px)}
+.app button:focus-visible,
+.app input:focus-visible,
+.app select:focus-visible,
+.app textarea:focus-visible{outline:0;box-shadow:0 0 0 3px var(--ui-focus)}
+.app input,
+.app select,
+.app textarea{min-height:42px;border:1px solid var(--ui-border-strong);border-radius:var(--ui-radius-sm);background:var(--ui-surface);color:var(--ui-text);padding:0 12px;min-width:0}
+.app textarea{padding-top:10px;padding-bottom:10px;resize:vertical}
+.app input::placeholder,
+.app textarea::placeholder{color:#98a2b3}
+
+/* Common buttons */
+.app .primary,
+.app .customerPrimary,
+.app .cashGatePrimary{background:var(--ui-primary);color:#fff;border:1px solid var(--ui-primary);font-weight:700}
+.app .primary:hover,
+.app .customerPrimary:hover,
+.app .cashGatePrimary:hover{background:var(--ui-primary-dark);border-color:var(--ui-primary-dark)}
+.app .secondary,
+.app .secondaryBtn,
+.app .textBtn,
+.app .range,
+.app .backToProducts{background:#fff;color:#344054;border:1px solid var(--ui-border-strong)}
+.app .secondary:hover,
+.app .secondaryBtn:hover,
+.app .textBtn:hover,
+.app .range:hover,
+.app .backToProducts:hover{border-color:var(--ui-primary);color:var(--ui-primary);background:#fff8fb}
+.app button:disabled{opacity:.58;cursor:not-allowed}
+
+/* Standard page sections/cards */
+.app .panel,
+.app .customerPanel,
+.app .customerReportPanel,
+.app .productPanel,
+.app .inventoryPanel,
+.app .salesPanel,
+.app .reportsPanel,
+.app .settingsPanel,
+.app .backupPanel,
+.app .printerPanel,
+.app .usersPanel,
+.app .permissionsPanel,
+.app .expensesPanel,
+.app .catalogPanel,
+.app .movementPanel{background:var(--ui-surface);border:1px solid var(--ui-border);border-radius:var(--ui-radius);box-shadow:var(--ui-shadow);min-width:0}
+
+/* Tables: readable on desktop and scroll safely on narrow widths */
+.app .customerTableWrap,
+.app .customerReportTableWrap,
+.app .tableWrap,
+.app .productsTableWrap,
+.app .inventoryTableWrap,
+.app .salesTableWrap,
+.app .reportsTableWrap,
+.app .expensesTableWrap,
+.app .usersTableWrap,
+.app .permissionsTableWrap{width:100%;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;border-radius:0 0 var(--ui-radius) var(--ui-radius)}
+.app table{width:100%;border-collapse:separate;border-spacing:0;min-width:720px;background:#fff}
+.app thead th{position:sticky;top:0;z-index:2;background:#f8fafc;color:#475467;font-size:12px;font-weight:800;border-bottom:1px solid var(--ui-border);white-space:nowrap}
+.app tbody td{font-size:13px;color:#344054;border-bottom:1px solid #eef1f5;vertical-align:middle}
+.app tbody tr:last-child td{border-bottom:0}
+.app tbody tr:hover td{background:#fcfcfd}
+.app th,.app td{padding:12px 14px;text-align:right}
+
+/* Search / toolbar consistency */
+.app .customerToolbar,
+.app .productsToolbar,
+.app .inventoryToolbar,
+.app .salesToolbar,
+.app .reportsToolbar,
+.app .pageToolbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.app .customerSearch,
+.app .searchBox,
+.app .tableSearch{min-height:42px;border:1px solid var(--ui-border-strong);border-radius:var(--ui-radius-sm);background:#fff;display:flex;align-items:center;gap:9px;padding:0 12px;min-width:240px;flex:1 1 280px}
+.app .customerSearch input,
+.app .searchBox input,
+.app .tableSearch input{border:0;outline:0;box-shadow:none;padding:0;min-height:40px;background:transparent;width:100%}
+
+/* Modal consistency */
+.app .customerBackdrop,
+.app .cashGateOverlay{padding:18px;overflow:auto}
+.app .customerModal,
+.app .customerReceiptModal,
+.app .cashGateCard{width:min(640px,100%);max-height:min(90vh,900px);overflow:auto;border-radius:18px}
+.app .customerModalHead,
+.app .customerReceiptHead{position:sticky;top:0;background:#fff;z-index:2}
+
+/* Responsive desktop / tablet */
+@media (max-width:1280px){
+  .content{width:calc(100% - 212px);padding-inline:20px}
+  .top{padding-inline:20px}
+  .four{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .three{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .mainGrid{grid-template-columns:1fr}
+  .bottom{grid-template-columns:1fr}
+}
+
+@media (max-width:980px){
+  .content{width:100%;margin:0;padding:20px 16px 28px}
+  .side{width:250px;top:70px;transform:translateX(100%);box-shadow:-16px 0 36px rgba(6,20,38,.18);transition:transform .2s ease}
+  .side.open{transform:translateX(0)}
+  .top{height:70px}
+  .mobile{display:block}
+  .tools{display:none}
+  .topCenter{display:none}
+  .brand{margin:0}
+  .four,.three{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+@media (max-width:720px){
+  .content{padding:16px 12px 24px}
+  .four,.three,.bottom{grid-template-columns:1fr}
+  .grid{gap:10px}
+  .stat{min-height:145px;padding:16px 18px}
+  .statValue{font-size:22px}
+  .panelHead{padding:13px 14px 9px;gap:10px;flex-wrap:wrap}
+  .notice{align-items:flex-start;padding:14px}
+  .notice button{margin-right:0}
+  .app .customerSearch,
+  .app .searchBox,
+  .app .tableSearch{min-width:100%;flex-basis:100%}
+  .app .customerToolbar,
+  .app .productsToolbar,
+  .app .inventoryToolbar,
+  .app .salesToolbar,
+  .app .reportsToolbar,
+  .app .pageToolbar{align-items:stretch}
+  .app .customerToolbar>button,
+  .app .productsToolbar>button,
+  .app .inventoryToolbar>button,
+  .app .salesToolbar>button,
+  .app .reportsToolbar>button,
+  .app .pageToolbar>button{width:100%}
+  .app .customerModalActions{position:sticky;bottom:0;background:#fff;padding-top:12px}
+  .app .customerModalActions button{min-width:110px}
+}
+
+@media (max-width:520px){
+  .top{padding-inline:10px}
+  .brandLogo{width:40px;height:40px}
+  .brand strong{font-size:14px}
+  .brand small{font-size:11px}
+  .side{width:min(90vw,300px)}
+  .title{margin-bottom:14px}
+  .title h1{font-size:20px}
+  .stat{min-height:136px}
+  .panelHead h2{font-size:15px}
+  .app th,.app td{padding:10px 11px}
+}
+
+/* Touch targets */
+@media (pointer:coarse){
+  .app button{min-height:44px}
+  .nav{min-height:52px}
+}
+
+/* Keep POS in its own design pass. */
+.posView{isolation:isolate}
+
+/* Hide the sidebar scrollbar while preserving scrolling. */
+.side{scrollbar-width:none;-ms-overflow-style:none}.side::-webkit-scrollbar{width:0;height:0;display:none}
+/* Shared pagination control for data-heavy screens. */
+.paginationBar{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:14px;padding:10px 4px}
+.paginationPages{display:flex;align-items:center;gap:5px}.paginationPage,.paginationBtn{min-width:36px;height:36px;border:1px solid #d9e0ea;background:#fff;color:#344054;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:0 10px;font-family:inherit;font-size:13px}.paginationPage.active{background:#e91e63;border-color:#e91e63;color:#fff;font-weight:800}.paginationBtn:disabled,.paginationPage:disabled{opacity:.45;cursor:not-allowed}.paginationMeta{font-size:12px;color:#667085;margin-inline-start:6px}
+
+/* Seamless desktop shell: sidebar is a full-height rail and the top bar sits beside it. */
+@media (min-width:981px){
+  .top{
+    width:calc(100% - 212px);
+    margin-right:212px;
+    margin-left:0;
+  }
+  .side{
+    top:0 !important;
+    bottom:0 !important;
+    height:100vh;
+  }
+}
+
+/* Mobile/tablet: restore the full-width top bar and dropdown side drawer. */
+@media (max-width:980px){
+  .top{
+    width:100%;
+    margin-right:0;
+    margin-left:0;
+  }
+  .side{
+    top:70px !important;
+    bottom:0 !important;
+    height:calc(100vh - 70px);
+  }
+}
+
+
+/* Stable desktop shell: fixed top bar beside a full-height sidebar. */
+@media (min-width:981px){
+  .top{
+    position:fixed !important;
+    top:0 !important;
+    left:0 !important;
+    right:212px !important;
+    width:auto !important;
+    height:84px !important;
+    margin:0 !important;
+    z-index:40 !important;
+  }
+  .side{
+    position:fixed !important;
+    right:0 !important;
+    top:0 !important;
+    bottom:0 !important;
+    width:212px !important;
+    height:100vh !important;
+    z-index:45 !important;
+  }
+  .content{
+    width:calc(100% - 212px) !important;
+    margin-right:212px !important;
+    margin-left:0 !important;
+    padding-top:104px !important;
+  }
+}
+
+/* Compact page chrome: internal pages should not look oversized. */
+@media (min-width:981px){
+  .content > .title{margin-bottom:14px}
+  .content > .title h1{font-size:22px}
+  .content > .title p{font-size:11px}
+  .content .panelHead{padding:12px 14px 9px}
+  .content .stat{min-height:140px;padding:14px 18px}
+  .content .statValue{font-size:23px}
+  .content .statIcon{width:44px;height:44px;top:13px;right:14px}
+  .content .inventoryStats{gap:12px;margin-bottom:14px}
+  .content .inventoryStat{min-height:112px;padding:14px}
+  .content .inventoryStat strong{font-size:22px}
+  .content .inventoryToolbar{padding:14px}
+  .content .inventoryTable th,
+  .content .inventoryTable td{padding:10px 11px;font-size:12px}
+  .content .customerTable th,
+  .content .customerTable td,
+  .content .productsTable th,
+  .content .productsTable td,
+  .content .salesTable th,
+  .content .salesTable td{padding:10px 11px;font-size:12px}
+  .content .customerPanel,
+  .content .productPanel,
+  .content .inventoryPanel,
+  .content .salesPanel,
+  .content .reportsPanel,
+  .content .settingsPanel,
+  .content .backupPanel,
+  .content .printerPanel,
+  .content .usersPanel,
+  .content .permissionsPanel,
+  .content .expensesPanel,
+  .content .catalogPanel,
+  .content .movementPanel{border-radius:10px}
+}
+
+/* Small screens: fixed header remains visible while content scrolls underneath. */
+@media (max-width:980px){
+  .top{
+    position:fixed !important;
+    top:0 !important;
+    left:0 !important;
+    right:0 !important;
+    width:100% !important;
+    margin:0 !important;
+    height:70px !important;
+    z-index:40 !important;
+  }
+  .side{
+    position:fixed !important;
+    right:0 !important;
+    top:70px !important;
+    bottom:0 !important;
+    height:calc(100vh - 70px) !important;
+    z-index:45 !important;
+  }
+  .content{
+    width:100% !important;
+    margin:0 !important;
+    padding-top:88px !important;
+  }
+}
+
+/* Final dashboard KPI fit: keep all seven cards on one row without value overflow. */
+.content .statsRow .stat{
+  container-type:inline-size;
+  overflow:hidden;
+}
+.content .statsRow .statTitle{
+  min-width:0;
+  min-height:30px;
+  padding-inline:28px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.content .statsRow .statValue{
+  width:100%;
+  min-width:0;
+  max-width:100%;
+  padding-inline:2px;
+  font-size:clamp(13px,11.5cqw,18px) !important;
+  line-height:1.05;
+  letter-spacing:-0.25px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:clip;
+  font-variant-numeric:tabular-nums;
+}
+.content .statsRow .statUnit,
+.content .statsRow .statNote{
+  max-width:100%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+/* After removing the Dashboard title/breadcrumb, keep the content consistently close to the top. */
+.content{padding-top:18px !important}
+@media(max-width:800px){
+  .content{padding-top:14px !important}
+}
+
+/* Desktop: keep all seven KPI cards on one line. Collapse only when the viewport is genuinely narrow. */
+.content .statsRow{
+  grid-template-columns:repeat(7,minmax(0,1fr)) !important;
+  gap:7px;
+}
+@media(max-width:900px){
+  .content .statsRow{grid-template-columns:repeat(4,minmax(0,1fr)) !important}
+}
+@media(max-width:800px){
+  .content .statsRow{grid-template-columns:repeat(2,minmax(0,1fr)) !important}
+}
+@media(max-width:520px){
+  .content .statsRow{grid-template-columns:1fr !important}
+}
+@media(max-width:980px){
+  .content{padding-top:88px !important}
+}

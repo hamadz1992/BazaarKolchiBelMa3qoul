@@ -1,0 +1,1 @@
+BEGIN; ALTER TABLE sales ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT now(); CREATE INDEX IF NOT EXISTS idx_sales_updated_at ON sales(updated_at DESC); COMMIT;

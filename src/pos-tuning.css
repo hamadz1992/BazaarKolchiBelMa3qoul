@@ -1,0 +1,373 @@
+/*
+  POS STYLE CONTROL
+  -----------------
+  هذا الملف مخصص للتحكم البصري فقط.
+  يوضع بعد pos.css حتى تكون قيمه هي المرجع الأخير.
+
+  طريقة العمل:
+  1) عدّل القيم الموجودة في :root فقط.
+  2) لا تحتاج إلى لمس pos.css القديم لكل تعديل شكلي.
+  3) لا تعدّل أي قاعدة خاصة بالبيانات أو PostgreSQL هنا.
+*/
+
+:root {
+  /* ===== الإطار العام ===== */
+  --pos-payment-width: 430px;
+  --pos-main-gap: 18px;
+
+  /* ===== الساعة ===== */
+  --pos-clock-height: 34px;
+  --pos-clock-font-size: 13px;
+  --pos-clock-bottom-gap: 7px;
+
+  /* ===== الأزرار العليا ===== */
+  --pos-top-button-height: 38px;
+  --pos-top-summary-height: 40px;
+  --pos-top-gap: 6px;
+
+  /* ===== عنوان تفاصيل البيع ===== */
+  --pos-payment-title-height: 48px;
+  --pos-payment-title-font-size: 18px;
+
+  /* ===== أسطر المبلغ ===== */
+  --pos-pay-line-height: 52px;
+  --pos-pay-line-font-size: 13px;
+  --pos-money-font-size: 22px;
+  --pos-input-height: 32px;
+
+  /* ===== زر إتمام البيع ===== */
+  --pos-complete-height: 52px;
+  --pos-complete-font-size: 19px;
+
+  /* ===== ديون العملاء ===== */
+  --pos-debts-margin-top: 8px;
+  --pos-debts-header-height: 34px;
+  --pos-debts-list-height: 112px;
+  --pos-debt-row-height: 34px;
+  --pos-debt-font-size: 11px;
+
+  /* ===== السلة ===== */
+  --pos-cart-head-height: 34px;
+  --pos-cart-row-height: 48px;
+
+  /* ===== فواتير اليوم ===== */
+  --pos-invoice-number-size: 12px;
+  --pos-invoice-date-size: 10px;
+  --pos-invoice-time-size: 10px;
+  --pos-invoice-qty-size: 10px;
+  --pos-invoice-total-size: 13px;
+  --pos-invoice-action-size: 32px;
+  --pos-invoice-action-gap: 5px;
+  --pos-invoice-columns: 150px 82px 65px 88px 105px minmax(155px,1fr);
+  --pos-invoice-gap: 6px;
+}
+
+/* =========================================================
+   1) العمود الأيمن / تفاصيل البيع
+   ========================================================= */
+
+.posMain {
+  grid-template-columns: minmax(0, 1fr) var(--pos-payment-width) !important;
+  gap: var(--pos-main-gap) !important;
+}
+
+.paymentPanel {
+  margin-top: 0 !important;
+}
+
+/* الساعة أعلى تفاصيل البيع */
+.paymentPanelClock {
+  height: var(--pos-clock-height) !important;
+  min-height: var(--pos-clock-height) !important;
+  margin: 0 0 var(--pos-clock-bottom-gap) !important;
+  font-size: var(--pos-clock-font-size) !important;
+}
+
+/* =========================================================
+   2) الأزرار فوق تفاصيل البيع
+   ========================================================= */
+
+.paymentPanel > .posTopBar {
+  margin: 0 !important;
+  padding: 7px 0 6px !important;
+  gap: var(--pos-top-gap) !important;
+}
+
+.paymentPanel > .posTopBar .posTopBtn,
+.paymentPanel > .posTopBar .posExitBtn {
+  height: var(--pos-top-button-height) !important;
+  min-height: var(--pos-top-button-height) !important;
+}
+
+.paymentPanel > .posTopSummary {
+  height: var(--pos-top-summary-height) !important;
+  min-height: var(--pos-top-summary-height) !important;
+  margin: 7px 0 6px !important;
+  gap: 7px !important;
+}
+
+.paymentPanel > .posTopSummary .posSummaryBtn {
+  height: var(--pos-top-summary-height) !important;
+  min-height: var(--pos-top-summary-height) !important;
+}
+
+/* =========================================================
+   3) تفاصيل البيع نفسها
+   ========================================================= */
+
+.paymentPanel > .paymentTitle:not(.posTopSummary) {
+  height: var(--pos-payment-title-height) !important;
+  min-height: var(--pos-payment-title-height) !important;
+  margin: 0 !important;
+}
+
+.paymentPanel > .paymentTitle:not(.posTopSummary) h2 {
+  font-size: var(--pos-payment-title-font-size) !important;
+}
+
+.paymentPanel > .payLine {
+  min-height: var(--pos-pay-line-height) !important;
+  padding: 9px 2px !important;
+  font-size: var(--pos-pay-line-font-size) !important;
+}
+
+.paymentPanel > .payLine strong {
+  font-size: var(--pos-money-font-size) !important;
+  line-height: 1.05 !important;
+}
+
+.paymentPanel > .payLine input {
+  height: var(--pos-input-height) !important;
+  min-height: var(--pos-input-height) !important;
+}
+
+.paymentPanel > .completeBtn {
+  height: var(--pos-complete-height) !important;
+  min-height: var(--pos-complete-height) !important;
+  font-size: var(--pos-complete-font-size) !important;
+}
+
+/* =========================================================
+   4) ديون العملاء
+   ========================================================= */
+
+.paymentPanel > .customerDebtsPanel {
+  margin-top: var(--pos-debts-margin-top) !important;
+}
+
+.paymentPanel > .customerDebtsPanel .customerDebtsHeader {
+  min-height: var(--pos-debts-header-height) !important;
+}
+
+.paymentPanel > .customerDebtsPanel .customerDebtViewport {
+  max-height: var(--pos-debts-list-height) !important;
+}
+
+.paymentPanel > .customerDebtsPanel .customerDebtItem {
+  min-height: var(--pos-debt-row-height) !important;
+  height: var(--pos-debt-row-height) !important;
+  font-size: var(--pos-debt-font-size) !important;
+}
+
+/* =========================================================
+   5) السلة
+   ========================================================= */
+
+.posLeft .cartTableHead {
+  height: var(--pos-cart-head-height) !important;
+  min-height: var(--pos-cart-head-height) !important;
+}
+
+.posLeft .cartRow {
+  height: var(--pos-cart-row-height) !important;
+  min-height: var(--pos-cart-row-height) !important;
+}
+
+/* =========================================================
+   6) فواتير اليوم
+   ========================================================= */
+
+/* الساعة داخل نافذة فواتير اليوم مخفية؛ الساعة الوحيدة هي ساعة POS */
+.todayInvoicesClock {
+  display: none !important;
+}
+
+.todayInvoiceCard {
+  grid-template-columns: var(--pos-invoice-columns) !important;
+  gap: var(--pos-invoice-gap) !important;
+}
+
+.todayInvoiceNumber {
+  font-size: var(--pos-invoice-number-size) !important;
+}
+
+.todayInvoiceDate,
+.todayInvoiceTime,
+.todayInvoiceQty {
+  font-size: var(--pos-invoice-date-size) !important;
+}
+
+.todayInvoiceTotal {
+  font-size: var(--pos-invoice-total-size) !important;
+}
+
+.invoiceActionIcons {
+  gap: var(--pos-invoice-action-gap) !important;
+}
+
+.invoiceActionIcons button {
+  width: var(--pos-invoice-action-size) !important;
+  min-width: var(--pos-invoice-action-size) !important;
+  height: var(--pos-invoice-action-size) !important;
+  min-height: var(--pos-invoice-action-size) !important;
+  flex: 0 0 var(--pos-invoice-action-size) !important;
+}
+
+/* =========================================================
+   7) استجابة الشاشات الصغيرة
+   ========================================================= */
+
+@media (max-width: 900px) {
+  .posMain {
+    grid-template-columns: 1fr !important;
+  }
+}
+.posRightColumn {
+  transform: translateY(-15px) !important;
+}
+
+/* ===== Final alignment for today's invoices: exactly 6 visible columns ===== */
+.todayInvoicesModal .todayInvoiceCard {
+  grid-template-columns: minmax(155px,1.7fr) 82px 68px 92px 115px 150px !important;
+  gap: 8px !important;
+  padding: 7px 9px !important;
+  align-items: center !important;
+}
+.todayInvoicesModal .todayInvoiceNumber {
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  text-align: right !important;
+  direction: ltr !important;
+}
+.todayInvoicesModal .todayInvoiceDate,
+.todayInvoicesModal .todayInvoiceTime,
+.todayInvoicesModal .todayInvoiceQty {
+  font-size: 10px !important;
+  white-space: nowrap !important;
+  text-align: center !important;
+}
+.todayInvoicesModal .todayInvoiceTotal {
+  font-size: 13px !important;
+  white-space: nowrap !important;
+  text-align: center !important;
+}
+.todayInvoicesModal .invoiceActionIcons {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  direction: rtl !important;
+  white-space: nowrap !important;
+}
+.todayInvoicesModal .invoiceActionIcons button {
+  width: 34px !important;
+  min-width: 34px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  flex: 0 0 34px !important;
+  padding: 0 !important;
+}
+@media (max-width: 720px) {
+  .todayInvoicesModal .todayInvoiceCard {
+    grid-template-columns: 125px 72px 58px 78px 100px 136px !important;
+    gap: 5px !important;
+    padding: 6px !important;
+  }
+  .todayInvoicesModal .todayInvoiceNumber { font-size: 11px !important; }
+  .todayInvoicesModal .todayInvoiceTotal { font-size: 12px !important; }
+  .todayInvoicesModal .invoiceActionIcons { gap: 4px !important; }
+  .todayInvoicesModal .invoiceActionIcons button { width: 30px !important; min-width: 30px !important; height: 30px !important; flex-basis: 30px !important; }
+}
+.paymentPanel {
+  position: relative !important;
+  top: -105px !important;
+}
+/* ===== تنسيق نافذة فواتير اليوم فقط — العرض 650px ===== */
+.todayInvoicesModal {
+  width: 650px !important;
+  max-width: calc(100vw - 24px) !important;
+  overflow: hidden !important;
+}
+
+.todayInvoicesModal .todayInvoicesHeader {
+  padding: 12px 16px !important;
+}
+
+.todayInvoicesModal .todayInvoicesTitle h2 {
+  margin: 0 !important;
+  line-height: 1.2 !important;
+}
+
+.todayInvoicesModal .todayInvoicesTitle span {
+  margin-top: 3px !important;
+  display: block !important;
+}
+
+.todayInvoicesModal .todayInvoiceCard {
+  grid-template-columns: 90px 72px 60px 84px 90px 132px !important;
+  gap: 6px !important;
+  padding: 8px 10px !important;
+  box-sizing: border-box !important;
+}
+
+.todayInvoicesModal .todayInvoiceNumber,
+.todayInvoicesModal .todayInvoiceDate,
+.todayInvoicesModal .todayInvoiceTime,
+.todayInvoicesModal .todayInvoiceQty,
+.todayInvoicesModal .todayInvoiceTotal {
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.todayInvoicesModal .todayInvoiceNumber {
+  text-align: right !important;
+}
+
+.todayInvoicesModal .todayInvoiceDate,
+.todayInvoicesModal .todayInvoiceTime,
+.todayInvoicesModal .todayInvoiceQty {
+  text-align: center !important;
+}
+
+.todayInvoicesModal .todayInvoiceTotal {
+  text-align: center !important;
+}
+
+.todayInvoicesModal .invoiceActionIcons {
+  display: flex !important;
+  justify-content: flex-start !important;
+  align-items: center !important;
+  gap: 5px !important;
+  flex-wrap: nowrap !important;
+  overflow: visible !important;
+}
+
+.todayInvoicesModal .invoiceActionIcons button {
+  width: 30px !important;
+  min-width: 30px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 0 !important;
+}
+
+@media (max-width: 620px) {
+  .todayInvoicesModal {
+    width: 650px !important;
+    max-width: calc(100vw - 12px) !important;
+  }
+}

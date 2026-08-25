@@ -1,0 +1,249 @@
+.backupView{padding-bottom:40px}.backupHeader h1{display:flex;align-items:center;gap:10px;margin:0 0 8px;font-size:28px}.backupHeader h1 svg{color:#e91e63}.backupHeader p{margin:0 0 24px;color:#718096}.backupGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.backupCard{background:#fff;border:1px solid #dfe5ee;border-radius:14px;padding:24px;box-shadow:0 2px 8px rgba(16,35,61,.04)}.backupCard.primary{grid-column:1/-1;display:flex;align-items:center;gap:18px}.backupIcon{width:52px;height:52px;border-radius:12px;display:grid;place-items:center;background:#fff0f6;color:#e91e63;flex:none}.backupCard h2{margin:0 0 7px;font-size:18px;color:#182230}.backupCard p{color:#718096;margin:0;line-height:1.7}.backupCard.primary button{margin-right:auto;flex:none;border:0;border-radius:8px;background:#e91e63;color:#fff;padding:12px 18px;font-family:inherit;display:flex;align-items:center;gap:7px;cursor:pointer}.backupCardHead{display:flex;align-items:center;gap:12px;margin-bottom:10px}.backupCardHead>svg{color:#e91e63}.backupCardHead strong{font-size:14px;color:#475467}.uploadBtn,.saveBackup{margin-top:16px;display:inline-flex;align-items:center;gap:7px;border:1px solid #d6deea;border-radius:8px;padding:10px 15px;cursor:pointer;color:#344054;background:#fff;font-family:inherit}.saveBackup{background:#e91e63;color:#fff;border-color:#e91e63}.backupSettings{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}.backupSettings label{display:flex;flex-direction:column;gap:7px;font-size:13px;color:#475467}.backupSettings select,.backupSettings input{height:42px;border:1px solid #d6deea;border-radius:8px;padding:0 10px;font-family:inherit;background:#fff;color:#182230;outline:none}.autoBackup small{display:block;color:#7b8798;line-height:1.6}.backupMessage{margin-top:18px;padding:13px 16px;border-radius:9px;background:#eefbf6;color:#147a5a}@media(max-width:800px){.backupGrid{grid-template-columns:1fr}.backupCard.primary{grid-column:auto;align-items:flex-start;flex-wrap:wrap}.backupCard.primary button{margin-right:0}.backupSettings{grid-template-columns:1fr}}.backupPath{display:flex;align-items:center;gap:8px;direction:ltr;word-break:break-all;margin-top:10px;font-size:12px;opacity:.8}.backupTimes{display:flex;flex-direction:column;gap:8px;margin:12px 0}.backupTimeRow{display:flex;gap:8px;align-items:center}.backupTimeRow input{flex:1}.iconBtn,.addTimeBtn,.manualBackup{border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.04);color:inherit;border-radius:8px;padding:8px 10px;display:inline-flex;align-items:center;gap:6px;cursor:pointer}.addTimeBtn{width:max-content}.backupActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.backupToggle{display:flex;align-items:center;gap:8px}.backupToggle input{width:18px;height:18px}.backupSettings{gap:14px}.backupCard button:disabled{opacity:.55;cursor:not-allowed}
+
+.restoreList{display:flex;flex-direction:column;gap:10px;margin-top:14px;max-height:320px;overflow:auto}.restoreRow{display:flex;justify-content:space-between;align-items:center;gap:12px;border:1px solid #e4e9f0;border-radius:10px;padding:10px 12px;background:#fafbfc}.restoreRow>div{min-width:0}.restoreRow b{display:block;word-break:break-all;color:#27364a;font-size:13px}.restoreRow small{display:block;margin-top:3px;color:#7b8798;font-size:11px}.restoreRow .uploadBtn{margin-top:0;flex:none}.restoreEmpty{padding:14px;border:1px dashed #d6deea;border-radius:10px;color:#7b8798;text-align:center}@media(max-width:600px){.restoreRow{align-items:flex-start;flex-direction:column}.restoreRow .uploadBtn{width:100%;justify-content:center}}
+
+/* =========================================================
+   النسخ الاحتياطي — تصميم Compact نهائي
+   تصغير الأحجام وتحسين توزيع الشاشة مع الحفاظ على الوظائف.
+   ========================================================= */
+
+.backupView{
+  padding-bottom:20px;
+}
+
+.backupHeader{
+  margin-bottom:10px;
+}
+
+.backupHeader h1{
+  gap:7px;
+  margin:0 0 4px;
+  font-size:22px;
+}
+
+.backupHeader h1 svg{
+  width:21px;
+  height:21px;
+}
+
+.backupHeader p{
+  margin:0 0 12px;
+  font-size:11px;
+  line-height:1.5;
+}
+
+/* البطاقة الرئيسية */
+.backupGrid{
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:12px;
+}
+
+.backupCard{
+  border-radius:10px;
+  padding:14px 16px;
+  box-shadow:0 1px 5px rgba(16,35,61,.035);
+}
+
+.backupCard.primary{
+  grid-column:1/-1;
+  min-height:72px;
+  gap:12px;
+  padding:12px 16px;
+}
+
+.backupIcon{
+  width:40px;
+  height:40px;
+  border-radius:9px;
+}
+
+.backupCard h2{
+  margin:0 0 4px;
+  font-size:16px;
+}
+
+.backupCard p{
+  line-height:1.5;
+  font-size:11px;
+}
+
+.backupCard.primary button{
+  padding:9px 13px;
+  font-size:12px;
+  border-radius:8px;
+}
+
+/* رؤوس البطاقات */
+.backupCardHead{
+  gap:9px;
+  margin-bottom:7px;
+}
+
+.backupCardHead>svg{
+  width:20px;
+  height:20px;
+}
+
+.backupCardHead strong{
+  font-size:11px;
+}
+
+/* آخر نسخة */
+.backupCard:nth-child(2){
+  min-height:168px;
+}
+
+.backupCard:nth-child(2)>p{
+  margin-bottom:3px;
+}
+
+.backupPath{
+  margin-top:8px;
+  font-size:10px;
+  line-height:1.3;
+}
+
+/* استعادة النسخ */
+.backupCard:nth-child(3){
+  min-height:168px;
+}
+
+.restoreList{
+  gap:7px;
+  margin-top:10px;
+  max-height:190px;
+  overflow-y:auto;
+  scrollbar-width:thin;
+}
+
+.restoreRow{
+  gap:8px;
+  border-radius:8px;
+  padding:8px 9px;
+}
+
+.restoreRow b{
+  font-size:11px;
+}
+
+.restoreRow small{
+  margin-top:2px;
+  font-size:10px;
+}
+
+.uploadBtn,
+.saveBackup{
+  margin-top:0;
+  padding:7px 10px;
+  font-size:11px;
+  border-radius:7px;
+}
+
+/* النسخ التلقائي */
+.autoBackup{
+  min-height:168px;
+}
+
+.backupSettings{
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+  margin:10px 0;
+}
+
+.backupSettings label{
+  gap:5px;
+  font-size:11px;
+}
+
+.backupSettings select,
+.backupSettings input{
+  height:34px;
+  border-radius:7px;
+  padding:0 8px;
+  font-size:11px;
+}
+
+.backupToggle{
+  justify-content:flex-start;
+  align-items:center !important;
+  flex-direction:row !important;
+  gap:7px !important;
+  padding-top:18px;
+}
+
+.backupToggle input{
+  width:16px !important;
+  height:16px !important;
+}
+
+.backupTimes{
+  gap:6px;
+  margin:9px 0;
+}
+
+.backupTimeRow{
+  gap:6px;
+}
+
+.backupTimeRow input{
+  height:34px;
+  border:1px solid #d6deea;
+  border-radius:7px;
+  padding:0 8px;
+}
+
+.iconBtn,
+.addTimeBtn,
+.manualBackup{
+  padding:6px 8px;
+  border-radius:7px;
+  font-size:11px;
+}
+
+.autoBackup>small{
+  font-size:10px;
+  line-height:1.45;
+}
+
+.backupActions{
+  gap:6px;
+  margin-top:9px;
+}
+
+.backupMessage{
+  margin-top:10px;
+  padding:9px 12px;
+  border-radius:8px;
+  font-size:11px;
+}
+
+/* توازن عمودي */
+.backupCard.primary + .backupCard,
+.backupCard.primary + .backupCard + .backupCard{
+  margin-top:0;
+}
+
+@media(max-width:900px){
+  .backupGrid{
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+}
+
+@media(max-width:760px){
+  .backupGrid{
+    grid-template-columns:1fr;
+  }
+
+  .backupCard.primary{
+    grid-column:auto;
+  }
+
+  .backupSettings{
+    grid-template-columns:1fr;
+  }
+
+  .backupToggle{
+    padding-top:0;
+  }
+}

@@ -1,0 +1,405 @@
+.movementsView{padding-bottom:40px}.movementsHeader{margin-bottom:22px}.movementsHeader h1{display:flex;align-items:center;gap:10px;margin:0 0 7px;font-size:28px;color:#182230}.movementsHeader h1 svg{color:#e91e63}.movementsHeader p{margin:0;color:#718096}.movementPanel{background:#fff;border:1px solid #dfe5ee;border-radius:12px;box-shadow:0 2px 8px rgba(16,35,61,.04);padding:20px;margin-bottom:20px}.movementToolbar{display:flex;justify-content:space-between;margin-bottom:16px}.movementSearch{height:44px;border:1px solid #d6deea;border-radius:8px;display:flex;align-items:center;gap:9px;padding:0 12px;color:#7b8798;width:min(460px,100%)}.movementSearch input{border:0;outline:0;width:100%;font-family:inherit;font-size:14px}.movementTableWrap{overflow:auto}.movementTable{width:100%;border-collapse:collapse;min-width:760px}.movementTable th,.movementTable td{padding:14px 12px;border-bottom:1px solid #edf0f5;text-align:right;font-size:13px}.movementTable th{background:#f8fafc;color:#667085;font-weight:700}.movementProduct{display:flex;align-items:center;gap:9px}.movementProduct span{width:34px;height:34px;border-radius:8px;background:#fff1f6;color:#e91e63;display:grid;place-items:center}.movementActions{display:flex;gap:7px}.movementActions button{height:35px;border-radius:7px;padding:0 11px;border:1px solid #d6deea;background:#fff;font-family:inherit;cursor:pointer;display:flex;align-items:center;gap:5px}.movementActions .inBtn{color:#138a68;border-color:#bce5d8;background:#f2fcf8}.movementActions .outBtn{color:#d83b54;border-color:#f2c6ce;background:#fff7f8}.historyHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}.historyHead h2{font-size:18px;margin:0}.historyHead span{font-size:13px;color:#718096}.historyList{display:flex;flex-direction:column}.historyRow{display:grid;grid-template-columns:42px 1fr 70px 180px;align-items:center;gap:10px;padding:12px 4px;border-bottom:1px solid #edf0f5}.historyIcon{width:34px;height:34px;border-radius:50%;display:grid;place-items:center}.historyIcon.in{background:#e9f9f3;color:#138a68}.historyIcon.out{background:#fff0f2;color:#d83b54}.historyRow div{display:flex;flex-direction:column;gap:3px}.historyRow small,.historyRow time{color:#7b8798;font-size:12px}.historyRow b{text-align:center;font-size:15px}.historyRow b.in{color:#138a68}.historyRow b.out{color:#d83b54}.historyRow time{text-align:left;direction:ltr}.historyEmpty{text-align:center;color:#7b8798;padding:35px}.movementModal{background:#fff;width:min(440px,calc(100vw - 30px));border-radius:13px;padding:20px;box-shadow:0 20px 60px rgba(0,0,0,.2)}.movementFormProduct{background:#f8fafc;border:1px solid #e5e9ef;border-radius:8px;padding:12px;margin-bottom:15px;font-weight:700}.movementModal label{display:block;font-size:13px;font-weight:700;color:#344054;margin-bottom:13px}.movementModal input{display:block;width:100%;height:42px;margin-top:7px;border:1px solid #d6deea;border-radius:7px;padding:0 11px;box-sizing:border-box;font-family:inherit;outline:none}.movementModal input:focus{border-color:#e91e63}.modalActions{display:flex;justify-content:flex-start;gap:8px;margin-top:18px}.cancelBtn{height:39px;padding:0 14px;border:1px solid #d6deea;background:#fff;border-radius:7px;font-family:inherit;cursor:pointer}.movementModal .primaryAction{height:39px;padding:0 15px;border:0;border-radius:7px;background:#ed1b68;color:#fff;font-family:inherit;cursor:pointer}@media(max-width:700px){.historyRow{grid-template-columns:38px 1fr 55px}.historyRow time{display:none}}
+
+/* حركة المخزون فقط: احتواء الجدول داخل الإطار بدون التأثير على سجل الحركات */
+.movementsView:not(.inventoryHistoryView){
+  width:100%; min-width:0; max-width:100%; box-sizing:border-box;
+}
+.movementsView:not(.inventoryHistoryView) .movementPanel{
+  width:100%; min-width:0; max-width:100%; box-sizing:border-box; overflow:hidden;
+}
+.movementsView:not(.inventoryHistoryView) .movementToolbar{width:100%;min-width:0}
+.movementsView:not(.inventoryHistoryView) .movementSearch{max-width:460px;box-sizing:border-box}
+.movementsView:not(.inventoryHistoryView) .movementTableWrap{
+  width:100%;min-width:0;max-width:100%;overflow-x:hidden;
+}
+.movementsView:not(.inventoryHistoryView) .movementTable{
+  width:100%;min-width:0;max-width:100%;table-layout:fixed;
+}
+.movementsView:not(.inventoryHistoryView) .movementTable th:nth-child(1),
+.movementsView:not(.inventoryHistoryView) .movementTable td:nth-child(1){width:30%}
+.movementsView:not(.inventoryHistoryView) .movementTable th:nth-child(2),
+.movementsView:not(.inventoryHistoryView) .movementTable td:nth-child(2){width:18%}
+.movementsView:not(.inventoryHistoryView) .movementTable th:nth-child(3),
+.movementsView:not(.inventoryHistoryView) .movementTable td:nth-child(3){width:18%}
+.movementsView:not(.inventoryHistoryView) .movementTable th:nth-child(4),
+.movementsView:not(.inventoryHistoryView) .movementTable td:nth-child(4){width:10%}
+.movementsView:not(.inventoryHistoryView) .movementTable th:nth-child(5),
+.movementsView:not(.inventoryHistoryView) .movementTable td:nth-child(5){width:24%}
+.movementsView:not(.inventoryHistoryView) .movementTable td:nth-child(1){overflow:hidden}
+.movementsView:not(.inventoryHistoryView) .movementProduct{min-width:0}
+.movementsView:not(.inventoryHistoryView) .movementProduct strong{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.movementsView:not(.inventoryHistoryView) .movementActions{justify-content:flex-start;flex-wrap:nowrap;min-width:0}
+.movementsView:not(.inventoryHistoryView) .movementActions button{flex:0 0 auto;white-space:nowrap}
+
+/* سجل الحركات: Compact مثل جدول المخزون */
+.inventoryHistoryView .historyOnly{padding:10px !important;margin-bottom:0 !important;border-radius:10px !important}
+.inventoryHistoryView .movementToolbar{margin-bottom:8px !important}
+.inventoryHistoryView .movementSearch{height:36px !important;padding:0 9px !important}
+.inventoryHistoryView .historyList{gap:0 !important;border-top:1px solid #edf0f5}
+.inventoryHistoryView .historyRow{
+  grid-template-columns:30px minmax(0,1fr) 56px 135px !important;
+  min-height:38px !important;height:38px !important;padding:4px 6px !important;gap:7px !important;box-sizing:border-box !important;
+}
+.inventoryHistoryView .historyIcon{width:26px !important;height:26px !important}
+.inventoryHistoryView .historyRow div{gap:1px !important;min-width:0 !important}
+.inventoryHistoryView .historyRow strong{font-size:11px !important;line-height:1.15 !important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.inventoryHistoryView .historyRow small,
+.inventoryHistoryView .historyRow time{font-size:10px !important;line-height:1.1 !important}
+.inventoryHistoryView .historyRow b{font-size:12px !important;line-height:1 !important}
+.inventoryHistoryView .historyList > .pagination{margin-top:8px !important;padding-top:0 !important}
+.inventoryHistoryView .historyEmpty{padding:18px !important}
+@media (max-width:900px){
+  .inventoryHistoryView .historyRow{grid-template-columns:30px minmax(0,1fr) 55px !important}
+  .inventoryHistoryView .historyRow time{display:none !important}
+}
+
+/* ====== MEDIUM / DESKTOP-FIT LAYOUT: حركة المخزون + سجل الحركات ======
+   لا يلمس الشاشات الأخرى. الهدف: نفس كثافة جدول المخزون، بدون scrollbars ظاهرة.
+*/
+.movementsView:not(.inventoryHistoryView) .movementPanel,
+.inventoryHistoryView .historyOnly{
+  padding:14px !important;
+  margin-bottom:14px !important;
+}
+
+.movementsView:not(.inventoryHistoryView) .movementToolbar,
+.inventoryHistoryView .movementToolbar{
+  margin-bottom:8px !important;
+}
+
+.movementsView:not(.inventoryHistoryView) .movementSearch,
+.inventoryHistoryView .movementSearch{
+  height:40px !important;
+  font-size:13px !important;
+}
+
+/* حركة المخزون: صفوف متوسطة */
+.movementsView:not(.inventoryHistoryView) .movementTableWrap{
+  overflow:hidden !important;
+}
+.movementsView:not(.inventoryHistoryView) .movementTable th,
+.movementsView:not(.inventoryHistoryView) .movementTable td{
+  padding:8px 9px !important;
+  font-size:12px !important;
+  line-height:1.15 !important;
+}
+.movementsView:not(.inventoryHistoryView) .movementProduct span{
+  width:30px !important;
+  height:30px !important;
+}
+.movementsView:not(.inventoryHistoryView) .movementActions{gap:5px !important}
+.movementsView:not(.inventoryHistoryView) .movementActions button{
+  height:31px !important;
+  padding:0 8px !important;
+  font-size:12px !important;
+}
+
+/* سجل الحركات: نفس الإيقاع البصري، حجم متوسط */
+.inventoryHistoryView .historyList{
+  max-height:none !important;
+  overflow:hidden !important;
+}
+.inventoryHistoryView .historyRow{
+  grid-template-columns:30px minmax(0,1fr) 56px 135px !important;
+  height:42px !important;
+  min-height:42px !important;
+  padding:5px 6px !important;
+  gap:7px !important;
+}
+.inventoryHistoryView .historyIcon{
+  width:28px !important;
+  height:28px !important;
+}
+.inventoryHistoryView .historyRow strong{font-size:12px !important}
+.inventoryHistoryView .historyRow small,
+.inventoryHistoryView .historyRow time{font-size:10.5px !important}
+.inventoryHistoryView .historyRow b{font-size:12px !important}
+
+/* Pagination تبقى داخل الشاشة وبشكل مضغوط بدل تمرير الصفحة */
+.movementsView .pagination,
+.inventoryHistoryView .pagination{
+  margin-top:8px !important;
+  padding:0 !important;
+  min-height:32px !important;
+}
+.movementsView .pagination button,
+.inventoryHistoryView .pagination button{
+  min-width:32px !important;
+  height:32px !important;
+  padding:0 8px !important;
+  font-size:12px !important;
+}
+
+@media (min-width:901px){
+  .movementsView:not(.inventoryHistoryView),
+  .inventoryHistoryView{
+    overflow:hidden !important;
+  }
+}
+
+
+/* ==========================================================
+   FINAL UNIFIED TABLE TUNING — only Inventory Movements screens
+   - حركة المخزون: سلعة / باركود / المخزون الحالي / الوحدة / إجراء
+   - سجل الحركات: سلعة / التفاصيل / الكمية / التاريخ والساعة
+   No extra stylesheet required.
+   ========================================================== */
+
+/* ---------- حركة المخزون ---------- */
+.movementsView:not(.inventoryHistoryView) .movementPanel{
+  padding:14px !important;
+  margin-bottom:14px !important;
+  box-sizing:border-box !important;
+}
+
+.movementsView:not(.inventoryHistoryView) .movementToolbar{
+  margin-bottom:8px !important;
+}
+
+.movementsView:not(.inventoryHistoryView) .movementSearch{
+  height:40px !important;
+  padding:0 10px !important;
+  box-sizing:border-box !important;
+}
+
+.movementsView:not(.inventoryHistoryView) .movementTableWrap{
+  width:100% !important;
+  max-width:100% !important;
+  min-width:0 !important;
+  overflow:hidden !important;
+}
+
+.movementsView:not(.inventoryHistoryView) .movementTable{
+  width:100% !important;
+  min-width:0 !important;
+  max-width:100% !important;
+  table-layout:fixed !important;
+  border-collapse:collapse !important;
+}
+
+.movementsView:not(.inventoryHistoryView) .movementTable th{
+  height:38px !important;
+  padding:7px 8px !important;
+  font-size:12px !important;
+  line-height:1.15 !important;
+  vertical-align:middle !important;
+}
+
+.movementsView:not(.inventoryHistoryView) .movementTable td{
+  height:46px !important;
+  padding:7px 8px !important;
+  font-size:12px !important;
+  line-height:1.15 !important;
+  vertical-align:middle !important;
+}
+
+.movementsView:not(.inventoryHistoryView) .movementProduct{
+  min-width:0 !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:8px !important;
+  overflow:hidden !important;
+}
+
+.movementsView:not(.inventoryHistoryView) .movementProduct span{
+  width:30px !important;
+  height:30px !important;
+  min-width:30px !important;
+  flex:0 0 30px !important;
+}
+
+.movementsView:not(.inventoryHistoryView) .movementProduct strong{
+  min-width:0 !important;
+  max-width:100% !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  white-space:nowrap !important;
+  font-size:12px !important;
+}
+
+.movementsView:not(.inventoryHistoryView) .movementActions{
+  display:flex !important;
+  align-items:center !important;
+  gap:4px !important;
+  flex-wrap:nowrap !important;
+  min-width:0 !important;
+}
+
+.movementsView:not(.inventoryHistoryView) .movementActions button{
+  height:32px !important;
+  min-width:32px !important;
+  padding:0 8px !important;
+  font-size:12px !important;
+  gap:4px !important;
+  flex:0 0 auto !important;
+}
+
+/* ---------- سجل حركات المخزون ---------- */
+.inventoryHistoryView .historyOnly{
+  padding:14px !important;
+  margin-bottom:14px !important;
+  box-sizing:border-box !important;
+}
+
+.inventoryHistoryView .movementToolbar{
+  margin-bottom:8px !important;
+}
+
+.inventoryHistoryView .movementSearch{
+  height:40px !important;
+  padding:0 10px !important;
+  box-sizing:border-box !important;
+}
+
+.inventoryHistoryView .historyTable{
+  width:100% !important;
+  max-width:100% !important;
+  min-width:0 !important;
+  box-sizing:border-box !important;
+  overflow:hidden !important;
+}
+
+/* نفس 4 أعمدة في الرأس والصف — يمنع أي تداخل */
+.inventoryHistoryView .historyTableHeader,
+.inventoryHistoryView .historyRow{
+  display:grid !important;
+  grid-template-columns:minmax(220px,1.35fr) minmax(260px,1.55fr) 90px 180px !important;
+  column-gap:14px !important;
+  align-items:center !important;
+  direction:rtl !important;
+  width:100% !important;
+  min-width:0 !important;
+  max-width:100% !important;
+  box-sizing:border-box !important;
+}
+
+.inventoryHistoryView .historyTableHeader{
+  height:38px !important;
+  min-height:38px !important;
+  padding:0 10px !important;
+  background:#f8fafc !important;
+  border-bottom:1px solid #e7ecf3 !important;
+  font-size:12px !important;
+  font-weight:700 !important;
+}
+
+.inventoryHistoryView .historyRow{
+  height:46px !important;
+  min-height:46px !important;
+  padding:5px 10px !important;
+  border-bottom:1px solid #edf0f5 !important;
+  overflow:hidden !important;
+}
+
+.inventoryHistoryView .historyRow > div,
+.inventoryHistoryView .historyRow > b,
+.inventoryHistoryView .historyRow > time,
+.inventoryHistoryView .historyTableHeader > div{
+  min-width:0 !important;
+  max-width:100% !important;
+  width:auto !important;
+  box-sizing:border-box !important;
+}
+
+.inventoryHistoryView .historyProduct{
+  display:flex !important;
+  align-items:center !important;
+  gap:8px !important;
+  min-width:0 !important;
+  overflow:hidden !important;
+}
+
+.inventoryHistoryView .historyProduct strong{
+  display:block !important;
+  min-width:0 !important;
+  max-width:100% !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  white-space:nowrap !important;
+  font-size:12px !important;
+  line-height:1.2 !important;
+}
+
+.inventoryHistoryView .historyDetails{
+  display:flex !important;
+  flex-direction:column !important;
+  gap:2px !important;
+  min-width:0 !important;
+  overflow:hidden !important;
+}
+
+.inventoryHistoryView .historyDetails span,
+.inventoryHistoryView .historyDetails small{
+  display:block !important;
+  min-width:0 !important;
+  max-width:100% !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  white-space:nowrap !important;
+}
+
+.inventoryHistoryView .historyDetails span{
+  font-size:12px !important;
+  line-height:1.2 !important;
+  color:#344054 !important;
+}
+
+.inventoryHistoryView .historyDetails small{
+  font-size:10px !important;
+  line-height:1.1 !important;
+  color:#7b8798 !important;
+}
+
+.inventoryHistoryView .historyRow > b{
+  font-size:12px !important;
+  line-height:1 !important;
+  text-align:center !important;
+  white-space:nowrap !important;
+}
+
+.inventoryHistoryView .historyRow > time{
+  direction:ltr !important;
+  text-align:right !important;
+  font-size:10px !important;
+  line-height:1.1 !important;
+  white-space:nowrap !important;
+  color:#718096 !important;
+}
+
+.inventoryHistoryView .historyIcon{
+  width:28px !important;
+  height:28px !important;
+  min-width:28px !important;
+  min-height:28px !important;
+  flex:0 0 28px !important;
+}
+
+/* Pagination بنفس الحجم في الشاشتين */
+.movementsView:not(.inventoryHistoryView) .pagination,
+.inventoryHistoryView .pagination{
+  margin-top:8px !important;
+  min-height:32px !important;
+  padding:0 !important;
+}
+
+.movementsView:not(.inventoryHistoryView) .pagination button,
+.inventoryHistoryView .pagination button{
+  min-width:32px !important;
+  height:32px !important;
+  padding:0 8px !important;
+  font-size:12px !important;
+}
+
+@media (max-width: 900px){
+  .inventoryHistoryView .historyTableHeader,
+  .inventoryHistoryView .historyRow{
+    grid-template-columns:minmax(170px,1.2fr) minmax(190px,1.35fr) 75px 150px !important;
+    column-gap:10px !important;
+  }
+}
+
+/* Final position tuning: raise the movement/history table panels without changing headers. */
+.movementsView:not(.inventoryHistoryView) .movementPanel,
+.inventoryHistoryView .historyOnly{
+  transform:translateY(-50px) !important;
+}

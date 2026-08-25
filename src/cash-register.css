@@ -1,0 +1,218 @@
+.cashView{padding-bottom:40px}.cashHeader h1{display:flex;align-items:center;gap:10px;margin:0 0 8px;font-size:28px}.cashHeader h1 svg{color:#e91e63}.cashHeader p{margin:0 0 24px;color:#718096}.cashStats{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:18px}.cashStats article,.cashCard{background:#fff;border:1px solid #dfe5ee;border-radius:14px;padding:22px;box-shadow:0 2px 8px rgba(16,35,61,.04)}.cashStats span{display:block;color:#667085;font-size:14px;margin-bottom:8px}.cashStats strong{font-size:25px}.cashGrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}.cashCard h2{margin:0 0 6px;font-size:18px}.cashCard>p{margin:0 0 16px;color:#718096}.cashRow,.cashForm{display:flex;gap:10px}.cashRow input,.cashForm input{height:42px;border:1px solid #d6deea;border-radius:8px;padding:0 12px;font-family:inherit;min-width:0}.cashRow input{flex:1}.cashRow button,.cashForm button{border:0;border-radius:8px;background:#e91e63;color:#fff;padding:0 16px;font-family:inherit;display:flex;align-items:center;gap:6px;cursor:pointer}.cashType{display:flex;gap:8px;margin:14px 0}.cashType button{border:1px solid #d6deea;background:#fff;border-radius:8px;padding:9px 14px;font-family:inherit;display:flex;align-items:center;gap:6px;cursor:pointer}.cashType button.active{background:#e91e63;color:#fff;border-color:#e91e63}.cashForm input:first-child{width:125px}.cashForm input:nth-child(2){flex:1}.cashTable{border-top:1px solid #edf0f5;margin-top:15px}.cashLine{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid #edf0f5}.cashLine>div{flex:1}.cashLine small{display:block;color:#8a94a6;margin-top:4px}.cashLine .in,.cashLine .out{width:32px;height:32px;border-radius:8px;display:grid;place-items:center}.cashLine .in{background:#eafaf3;color:#16835d}.cashLine .out{background:#fff1f1;color:#d14343}.positive{color:#16835d}.negative{color:#d14343}.empty{padding:20px 0!important}@media(max-width:800px){.cashStats,.cashGrid{grid-template-columns:1fr}.cashForm{flex-wrap:wrap}.cashForm input,.cashForm input:first-child{width:100%;flex:1;height:42px}.cashForm button{height:42px}}.cashSessionCard{margin-bottom:18px}.cashSessionTop{display:flex;justify-content:space-between;align-items:center;gap:20px}.cashSessionTop h2{margin:0 0 6px}.cashStatus{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:8px 12px;font-size:13px;font-weight:700}.cashStatus.open{background:#eafaf3;color:#16835d}.cashStatus.closed{background:#fff1f1;color:#b42318}.cashCloseRow{display:flex;align-items:end;gap:12px;margin-top:18px;padding-top:18px;border-top:1px solid #edf0f5}.cashCloseRow>div{flex:1}.cashCloseRow span{display:block;color:#718096;font-size:13px;margin-bottom:5px}.cashCloseRow strong{font-size:20px}.cashCloseRow input{width:180px;height:42px;border:1px solid #d6deea;border-radius:8px;padding:0 12px;font-family:inherit}.cashCloseRow button{height:42px;border:0;border-radius:8px;background:#e91e63;color:#fff;padding:0 16px;font-family:inherit;display:flex;align-items:center;gap:6px;cursor:pointer}.cashCloseRow button:disabled,.cashRow button:disabled,.cashForm button:disabled{opacity:.55;cursor:not-allowed}.cashMessage{margin:0 0 18px;padding:12px 14px;border-radius:10px;background:#f7f8fb;border:1px solid #e4e8f0;color:#344054}@media(max-width:800px){.cashSessionTop,.cashCloseRow{flex-direction:column;align-items:stretch}.cashCloseRow input{width:100%}}
+
+
+/* =========================================================
+   الصندوق — التخطيط النهائي
+   3 بطاقات في الأعلى بعرض كامل
+   اليسار: آخر الحركات
+   اليمين: الصندوق المفتوح / الرصيد الافتتاحي / إضافة حركة
+   ========================================================= */
+
+.cashView{
+  padding-bottom:24px;
+}
+
+.cashStats{
+  display:grid !important;
+  grid-template-columns:repeat(3, minmax(0, 1fr));
+  gap:10px;
+  width:100%;
+  margin:0 0 12px;
+}
+
+.cashStats article{
+  min-width:0;
+  min-height:68px;
+  padding:11px 14px;
+  border-radius:10px;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+  box-sizing:border-box;
+}
+
+.cashStats span{
+  margin:0 0 4px;
+  font-size:11px;
+  line-height:1.2;
+}
+
+.cashStats strong{
+  font-size:19px;
+  line-height:1.1;
+  white-space:nowrap;
+}
+
+.cashMainLayout{
+  display:grid;
+  grid-template-columns:minmax(0,1.45fr) minmax(360px,.95fr);
+  gap:14px;
+  align-items:start;
+}
+
+.cashHistoryColumn,
+.cashRightColumn{
+  min-width:0;
+}
+
+.cashRightColumn{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.cashHistoryColumn .history{
+  margin:0;
+  min-height:100%;
+  padding:14px 16px;
+  border-radius:10px;
+}
+
+.cashSectionTitle{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:3px;
+}
+
+.cashSectionTitle h2{
+  margin:0;
+  font-size:17px;
+}
+
+.cashSectionTitle > span{
+  min-width:26px;
+  height:26px;
+  padding:0 7px;
+  border-radius:999px;
+  background:#f1f4f8;
+  color:#667085;
+  display:grid;
+  place-items:center;
+  font-size:11px;
+  font-weight:700;
+}
+
+.cashHistoryColumn .cashTable{
+  margin-top:8px;
+}
+
+.cashHistoryColumn .cashLine{
+  padding:9px 0;
+  gap:9px;
+}
+
+.cashHistoryColumn .cashLine .in,
+.cashHistoryColumn .cashLine .out{
+  width:30px;
+  height:30px;
+  min-width:30px;
+}
+
+.cashHistoryColumn .cashLine strong{
+  font-size:12px;
+}
+
+.cashHistoryColumn .cashLine small{
+  font-size:10px;
+  margin-top:2px;
+}
+
+.cashHistoryColumn .cashLine b{
+  font-size:12px;
+  white-space:nowrap;
+}
+
+.cashRightColumn .cashCard{
+  margin:0;
+  padding:13px 15px;
+  border-radius:10px;
+}
+
+.cashRightColumn .cashCard h2{
+  font-size:16px;
+  margin-bottom:4px;
+}
+
+.cashRightColumn .cashCard > p{
+  font-size:11px;
+  margin-bottom:9px;
+}
+
+.cashRightColumn .cashSessionTop{
+  gap:12px;
+}
+
+.cashRightColumn .cashStatus{
+  padding:6px 9px;
+  font-size:11px;
+}
+
+.cashRightColumn .cashCloseRow{
+  margin-top:10px;
+  padding-top:10px;
+  gap:8px;
+}
+
+.cashRightColumn .cashCloseRow strong{
+  font-size:17px;
+}
+
+.cashRightColumn .cashCloseRow input{
+  width:130px;
+  height:36px;
+}
+
+.cashRightColumn .cashCloseRow button,
+.cashRightColumn .cashRow button,
+.cashRightColumn .cashForm button{
+  height:36px;
+  padding:0 12px;
+  font-size:12px;
+}
+
+.cashRightColumn .cashRow input,
+.cashRightColumn .cashForm input{
+  height:36px;
+  font-size:12px;
+}
+
+.cashRightColumn .cashType{
+  margin:7px 0;
+  gap:6px;
+}
+
+.cashRightColumn .cashType button{
+  padding:7px 11px;
+  font-size:12px;
+}
+
+.cashRightColumn .cashForm{
+  gap:7px;
+}
+
+@media(max-width:900px){
+  .cashMainLayout{
+    grid-template-columns:1fr;
+  }
+
+  .cashHistoryColumn{
+    order:2;
+  }
+
+  .cashRightColumn{
+    order:1;
+  }
+
+  .cashStats{
+    grid-template-columns:repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media(max-width:620px){
+  .cashStats{
+    grid-template-columns:1fr;
+  }
+}

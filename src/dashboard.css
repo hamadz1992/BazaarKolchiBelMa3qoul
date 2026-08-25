@@ -1,0 +1,328 @@
+/* Final visual refinement layer for the dashboard reference design */
+.stat,.panel,.notice{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}.stat:hover,.panel:hover,.notice:hover{box-shadow:0 8px 24px rgba(10,24,45,.08)}.stat:hover{transform:translateY(-2px)}
+.navArrow{margin-right:auto!important;width:16px!important;height:16px!important;opacity:.75}.sub button{width:100%;background:transparent;color:#e6ebf2;display:flex;align-items:center;gap:9px;padding:7px 0;text-align:right;font-size:13px}.sub button:hover{color:#fff}.sub button svg{opacity:.75}.chartPanel{overflow:hidden}.chartPanel .panelHead{border-bottom:1px solid #edf0f4}.ops .panelHead{border-bottom:1px solid #edf0f4}.notice{overflow:hidden}.notice button{transition:background .15s ease,transform .15s ease}.notice button:hover{transform:translateY(-1px);background:#fff8f0}.range svg{flex:none}.textBtn svg{flex:none}@media(max-width:800px){.side{box-shadow:-14px 0 30px rgba(0,0,0,.22)}.content{overflow:hidden}}
+
+/* Dashboard compact one-row cards: prevent long values from spilling outside their cards. */
+.statsRow .stat{
+  container-type:inline-size;
+  overflow:hidden;
+}
+.statsRow .statTitle{
+  min-width:0;
+  min-height:30px;
+  padding-inline:28px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.statsRow .statValue{
+  width:100%;
+  min-width:0;
+  max-width:100%;
+  padding-inline:2px;
+  font-size:clamp(13px,11.5cqw,18px);
+  line-height:1.05;
+  letter-spacing:-0.25px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:clip;
+  font-variant-numeric:tabular-nums;
+}
+.statsRow .statUnit,
+.statsRow .statNote{
+  max-width:100%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+/* The dashboard now starts directly with the KPI row; keep the same clean top spacing on all pages. */
+.content{padding-top:18px}
+
+@media(max-width:1100px){
+  .content{padding-top:16px}
+  .statsRow .statValue{font-size:clamp(13px,12cqw,19px)}
+}
+@media(max-width:800px){
+  .content{padding-top:14px}
+}
+
+/* Dashboard final balance pass: smaller KPI row, safer numeric fitting, tighter lower panels. */
+.statsRow {
+  align-items: stretch;
+  gap: 6px;
+}
+
+.statsRow .stat {
+  min-height: 118px;
+  height: 118px;
+  padding: 10px 8px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.statsRow .statIcon {
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+}
+
+.statsRow .statTitle {
+  min-height: 24px;
+  padding-inline: 30px 4px;
+  font-size: 11px;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.statsRow .statValue {
+  margin-top: 4px;
+  padding-inline: 0;
+  font-size: clamp(12px, 9.7cqw, 17px);
+  line-height: 1;
+  letter-spacing: -0.35px;
+  overflow: hidden;
+  text-overflow: clip;
+}
+
+.statsRow .statUnit {
+  margin-top: 2px;
+  font-size: 9px;
+  line-height: 1.1;
+}
+
+.statsRow .statNote {
+  margin-top: auto;
+  padding-bottom: 1px;
+  font-size: 8.5px;
+  line-height: 1.1;
+}
+
+.statsRow .link {
+  margin-top: auto;
+  padding: 0;
+  font-size: 9px;
+  line-height: 1;
+  justify-content: center;
+}
+
+.statsRow + .mainGrid {
+  margin-top: 6px;
+}
+
+.mainGrid {
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.mainGrid .panelHead {
+  padding: 12px 14px 8px;
+}
+
+.mainGrid .panelHead h2 {
+  font-size: 15px;
+}
+
+.mainGrid .chartPanel {
+  min-height: 286px;
+}
+
+.mainGrid .chart {
+  height: 196px;
+  padding: 0 12px;
+}
+
+.mainGrid .axis {
+  padding: 14px 0 26px;
+}
+
+.mainGrid .chartFoot {
+  padding: 0 16px 7px;
+}
+
+.mainGrid .operation {
+  min-height: 52px;
+  grid-template-columns: 36px minmax(0, 1fr) auto 82px;
+  gap: 6px;
+  margin: 0 9px;
+}
+
+.mainGrid .opIcon {
+  width: 36px;
+  height: 36px;
+}
+
+.mainGrid .operation strong {
+  font-size: 12px;
+}
+
+.mainGrid .operation small {
+  font-size: 9px;
+}
+
+.mainGrid .operation > b {
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.mainGrid .operation > span {
+  font-size: 9px;
+}
+
+.bottom {
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.bottom .notice {
+  min-height: 74px;
+  padding: 9px 12px;
+  gap: 9px;
+}
+
+.bottom .noticeIcon {
+  width: 34px;
+  height: 34px;
+}
+
+.bottom .notice h3 {
+  font-size: 12px;
+}
+
+.bottom .notice p {
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.bottom .notice strong {
+  font-size: 12px;
+}
+
+@media (max-width: 1100px) {
+  .statsRow .stat {
+    min-height: 116px;
+    height: 116px;
+  }
+
+  .statsRow .statValue {
+    font-size: clamp(12px, 9.8cqw, 17px);
+  }
+}
+
+@media (max-width: 800px) {
+  .statsRow .stat {
+    min-height: 120px;
+    height: 120px;
+  }
+
+  .mainGrid .chart {
+    height: 205px;
+  }
+}
+
+/* ===== Actual dashboard polish v2 ===== */
+.content{overflow-x:hidden}
+.statsRow{
+  display:grid;
+  grid-template-columns:repeat(7,minmax(0,1fr));
+  gap:8px;
+  align-items:stretch;
+}
+.statsRow .stat{
+  min-width:0;
+  height:124px;
+  min-height:124px;
+  padding:9px 8px 8px;
+  border-radius:9px;
+  overflow:hidden;
+}
+.statsRow .statTitle{
+  min-width:0;
+  max-width:100%;
+  padding-inline:34px 24px;
+  font-size:10.5px;
+  line-height:1.25;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.statsRow .statValue{
+  min-width:0;
+  width:100%;
+  max-width:100%;
+  margin-top:7px;
+  padding:0;
+  font-size:17px;
+  line-height:1;
+  font-weight:800;
+  letter-spacing:-.25px;
+  text-align:center;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:clip;
+  font-variant-numeric:tabular-nums;
+}
+.statsRow .statValue.statValueMedium{font-size:14px;letter-spacing:-.2px}
+.statsRow .statValue.statValueLong{font-size:11.5px;letter-spacing:-.15px}
+.statsRow .statUnit{margin-top:3px;font-size:9px;line-height:1.1}
+.statsRow .statNote{margin-top:auto;padding-top:4px;font-size:8.5px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.statsRow .link{margin-top:auto;font-size:9px;line-height:1}
+.statsRow .statIcon{top:8px;right:8px;width:32px;height:32px;border-radius:8px}
+.statsRow .statIcon svg{width:18px;height:18px}
+.statsRow + .mainGrid{margin-top:8px}
+.mainGrid{
+  grid-template-columns:minmax(0,1.08fr) minmax(0,1.34fr);
+  gap:8px;
+  margin-top:8px;
+}
+.mainGrid .panel{min-height:272px}
+.mainGrid .panelHead{padding:10px 12px 8px;min-height:56px}
+.mainGrid .panelHead h2{font-size:14px}
+.mainGrid .operation{min-height:51px;grid-template-columns:34px minmax(0,1fr) auto 76px;gap:6px;margin:0 8px}
+.mainGrid .opIcon{width:32px;height:32px}
+.mainGrid .operation strong{font-size:11.5px}
+.mainGrid .operation small{font-size:9px}
+.mainGrid .operation>b{font-size:11.5px;white-space:nowrap}
+.mainGrid .operation>span{font-size:9px;white-space:nowrap}
+.mainGrid .chart{height:186px;padding:0 10px}
+.mainGrid .axis{padding:14px 0 26px;font-size:9px}
+.mainGrid .chartFoot{padding:0 12px 6px;font-size:9px}
+.bottom{gap:8px;margin-top:8px}
+.bottom .notice{min-height:70px;padding:8px 11px;gap:8px}
+.bottom .noticeIcon{width:32px;height:32px}
+.bottom .notice h3{font-size:11.5px}
+.bottom .notice strong{font-size:11.5px}
+.bottom .notice p{font-size:9.5px;line-height:1.35;margin:1px 0}
+
+@media (max-width:1150px){
+  .statsRow{gap:6px}
+  .statsRow .statTitle{font-size:10px;padding-inline:31px 20px}
+  .statsRow .statValue{font-size:16px}
+  .statsRow .statValue.statValueMedium{font-size:13px}
+  .statsRow .statValue.statValueLong{font-size:10.5px}
+}
+@media (max-width:1100px){
+  .statsRow{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .mainGrid{grid-template-columns:1fr}
+}
+@media (max-width:800px){
+  .statsRow{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+  .statsRow .stat{height:122px;min-height:122px}
+}
+@media (max-width:520px){
+  .statsRow{grid-template-columns:1fr}
+}
+
+
+/* Functional dashboard controls */
+.chartPanel .panelHead{align-items:center}
+.chartPanel .panelHead>div:first-child{min-width:0}
+.rangeWrap{flex:0 0 auto}
+.rangeSelect{min-width:82px}
+.statsRow .link,.notice.stock button,.textBtn{cursor:pointer}

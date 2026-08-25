@@ -1,0 +1,19 @@
+/* Global scrollbar suppression: scrolling remains available, scrollbars are not visible. */
+html, body, #root, #root * {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+#root::-webkit-scrollbar,
+#root *::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+  background: transparent !important;
+}
+
+/* Electron/Chromium overlays can still reserve space; remove visible tracks. */
+* {
+  scrollbar-color: transparent transparent;
+}

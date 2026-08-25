@@ -1,0 +1,130 @@
+.productsView{padding:0 0 30px}.productsHeader{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}.productsHeader h1{font-size:24px;margin:0}.productsHeader p{margin:4px 0 0;color:#7b8492;font-size:13px}.primaryAction{background:#e91e63;color:#fff;border-radius:7px;min-height:42px;padding:0 18px;display:inline-flex;align-items:center;justify-content:center;gap:7px;font-weight:700;box-shadow:0 4px 12px #e91e6328}.primaryAction:hover{background:#d91859}.productsToolbar{display:flex;gap:12px;align-items:center;margin-bottom:14px}.searchBox{height:44px;background:#fff;border:1px solid #dfe4ec;border-radius:8px;display:flex;align-items:center;gap:9px;padding:0 13px;flex:1;max-width:620px;color:#7a8494}.searchBox input{border:0;outline:0;width:100%;font:inherit;font-size:13px}.productsCount{background:#fff;border:1px solid #dfe4ec;border-radius:8px;padding:10px 16px;color:#5b6574;font-size:13px}.productsPanel{background:#fff;border:1px solid #e1e6ef;border-radius:10px;box-shadow:0 2px 8px #1420340a;overflow:hidden}.productsTableWrap{overflow:auto}.productsTable{width:100%;border-collapse:collapse;min-width:900px}.productsTable th{background:#f8fafc;color:#596475;font-size:12px;font-weight:700;padding:14px 13px;text-align:right;border-bottom:1px solid #e7ebf1;white-space:nowrap}.productsTable td{padding:14px 13px;border-bottom:1px solid #edf0f4;color:#424d5d;font-size:12px;white-space:nowrap}.productsTable tbody tr:hover{background:#fbfcfe}.productName{display:flex;align-items:center;gap:9px;min-width:170px}.productIcon{width:36px;height:36px;border-radius:8px;background:#f0f5ff;color:#1666d9;display:grid;place-items:center}.salePrice{font-weight:700;color:#0c9b6a}.stockOk,.stockLow{display:inline-grid;place-items:center;min-width:34px;padding:4px 8px;border-radius:6px;font-weight:700}.stockOk{background:#eaf8f2;color:#0c9b6a}.stockLow{background:#fdeaf0;color:#d51c57}.rowActions{display:flex;gap:6px}.rowActions button{width:34px;height:34px;border:1px solid #e0e5ec;background:#fff;color:#687385;border-radius:6px;display:grid;place-items:center}.rowActions button:hover{color:#e91e63;border-color:#e91e63}.rowActions button:last-child:hover{color:#d51c57;border-color:#d51c57}.emptyProducts{text-align:center;padding:50px;color:#7b8492}.modalBackdrop{position:fixed;inset:0;background:#06142680;display:grid;place-items:center;padding:20px;z-index:50}.productModal{width:min(680px,100%);background:#fff;border-radius:12px;box-shadow:0 18px 60px #06142635;padding:22px}.modalHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}.modalHead h2{margin:0;font-size:19px}.modalHead>button{background:#f4f6f9;color:#566173;width:36px;height:36px;border-radius:7px;display:grid;place-items:center}.formGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.formGrid label{font-size:12px;color:#566173;font-weight:600;display:flex;flex-direction:column;gap:6px}.formGrid input{height:42px;border:1px solid #dce2ea;border-radius:7px;padding:0 11px;outline:0;font:inherit;font-size:13px}.formGrid input:focus{border-color:#e91e63;box-shadow:0 0 0 3px #e91e6312}.modalActions{display:flex;justify-content:flex-start;gap:10px;margin-top:22px}.cancelBtn{height:42px;padding:0 18px;background:#f2f4f7;color:#536072;border-radius:7px;font-weight:600}@media(max-width:700px){.productsHeader{align-items:flex-start;gap:12px;flex-direction:column}.productsToolbar{flex-direction:column;align-items:stretch}.searchBox{max-width:none}.formGrid{grid-template-columns:1fr}}
+.productsHeaderActions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}.quickAction{height:42px;padding:0 13px;border:1px solid #dfe4ec;background:#fff;color:#526174;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-weight:600}.quickAction:hover{border-color:#e91e63;color:#e91e63;background:#fff7fa}@media(max-width:900px){.productsHeaderActions{width:100%;justify-content:flex-start}}
+
+/* Products toolbar: keep actions, search and counter on one row only. */
+.productsView {
+  display: grid;
+  grid-template-columns: max-content max-content max-content max-content max-content minmax(280px, 1fr) max-content;
+  align-items: center;
+  column-gap: 8px;
+  row-gap: 12px;
+  padding: 0 0 24px;
+}
+
+.productsHeader {
+  display: contents;
+  margin: 0;
+}
+
+.productsHeader > div:first-child {
+  display: none;
+}
+
+.productsHeaderActions {
+  display: contents;
+}
+
+.productsHeaderActions .quickAction,
+.productsHeaderActions .primaryAction {
+  height: 42px;
+  min-height: 42px;
+  white-space: nowrap;
+}
+
+.productsToolbar {
+  display: contents;
+  margin: 0;
+}
+
+.productsToolbar .searchBox {
+  grid-column: auto;
+  width: auto;
+  max-width: none;
+  min-width: 0;
+}
+
+.productsToolbar .productsCount {
+  white-space: nowrap;
+}
+
+.productsPanel {
+  grid-column: 1 / -1;
+  width: 100%;
+}
+
+@media (max-width: 1180px) {
+  .productsView {
+    grid-template-columns: repeat(5, max-content) minmax(220px, 1fr) max-content;
+  }
+
+  .productsHeaderActions .quickAction,
+  .productsHeaderActions .primaryAction {
+    padding-inline: 10px;
+    gap: 5px;
+  }
+}
+
+@media (max-width: 980px) {
+  .productsView {
+    grid-template-columns: repeat(4, max-content) minmax(200px, 1fr) max-content;
+  }
+
+  .productsHeaderActions .quickAction,
+  .productsHeaderActions .primaryAction {
+    font-size: 12px;
+  }
+
+  .productsHeaderActions .quickAction:nth-child(4) {
+    display: none;
+  }
+}
+
+
+/* شريط السلع — كل الأدوات في سطر واحد */
+.productsToolbar{
+  display:flex !important;
+  flex-wrap:nowrap !important;
+  align-items:center !important;
+  gap:8px !important;
+  width:100%;
+  min-width:0;
+}
+
+.productsToolbar > *{
+  flex:0 0 auto;
+  min-width:0;
+}
+
+.productsToolbar .productsSearch{
+  flex:1 1 auto !important;
+  min-width:180px !important;
+  width:auto !important;
+}
+
+.productsToolbar .productsCount{
+  order:99;
+  min-width:92px;
+  height:44px;
+  padding:0 12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  white-space:nowrap;
+  box-sizing:border-box;
+}
+
+.productsToolbar .favoritesFilter{
+  height:44px;
+  white-space:nowrap;
+}
+
+@media(max-width:900px){
+  .productsToolbar{
+    gap:6px !important;
+  }
+
+  .productsToolbar .productsCount{
+    min-width:72px;
+    padding:0 8px;
+  }
+}

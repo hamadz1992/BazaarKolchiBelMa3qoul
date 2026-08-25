@@ -1,0 +1,166 @@
+.expensesView{padding-bottom:40px}.expensesHeader h1{display:flex;align-items:center;gap:10px;margin:0 0 8px;font-size:28px}.expensesHeader h1 svg{color:#e91e63}.expensesHeader p{margin:0 0 24px;color:#718096}.expenseStats{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:18px}.expenseStats article,.expenseCard{background:#fff;border:1px solid #dfe5ee;border-radius:14px;padding:22px;box-shadow:0 2px 8px rgba(16,35,61,.04)}.expenseStats span{display:block;color:#667085;font-size:14px;margin-bottom:8px}.expenseStats strong{font-size:24px}.expenseCard{margin-bottom:18px}.expenseCard h2{margin:0 0 16px;font-size:18px}.expenseForm{display:grid;grid-template-columns:1fr 1fr 2fr auto;gap:10px}.expenseForm input,.expenseForm select,.expenseListHead input{height:42px;border:1px solid #d6deea;border-radius:8px;padding:0 12px;font-family:inherit;min-width:0}.expenseForm button{border:0;border-radius:8px;background:#e91e63;color:#fff;padding:0 18px;font-family:inherit;display:flex;align-items:center;gap:6px;cursor:pointer}.expenseListHead{display:flex;justify-content:space-between;align-items:center;gap:15px}.expenseListHead label{display:flex;align-items:center;gap:7px;border:1px solid #d6deea;border-radius:8px;padding-right:10px}.expenseListHead input{border:0;outline:0}.expenseRow{display:flex;align-items:center;gap:14px;padding:15px 0;border-top:1px solid #edf0f5}.expenseRow>div{flex:1}.expenseRow small{display:block;color:#8a94a6;margin-top:5px}.expenseRow b{color:#d14343}.expenseRow button{border:0;background:#fff1f1;color:#d14343;width:34px;height:34px;border-radius:8px;display:grid;place-items:center;cursor:pointer}.expenseEmpty{padding:25px 0;color:#8a94a6;text-align:center}@media(max-width:800px){.expenseStats{grid-template-columns:1fr}.expenseForm{grid-template-columns:1fr}.expenseForm button{height:42px}.expenseListHead{align-items:stretch;flex-direction:column}.expenseListHead label{width:100%}}
+
+
+/* =========================================================
+   المصاريف — تصميم Compact متناسق مع المبيعات والعملاء
+   تعديل بصري فقط.
+   ========================================================= */
+
+.expensesView{
+  padding-bottom:22px;
+}
+
+.expensesHeader h1{
+  font-size:23px;
+  gap:8px;
+  margin-bottom:4px;
+}
+
+.expensesHeader h1 svg{
+  width:22px;
+  height:22px;
+}
+
+.expensesHeader p{
+  font-size:11px;
+  margin-bottom:12px;
+}
+
+/* بطاقات الإحصائيات */
+.expenseStats{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+  margin-bottom:12px;
+}
+
+.expenseStats article{
+  height:68px;
+  padding:11px 14px;
+  border-radius:10px;
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+.expenseStats span{
+  font-size:11px;
+  margin-bottom:4px;
+}
+
+.expenseStats strong{
+  font-size:19px;
+  line-height:1.1;
+}
+
+/* بطاقة إضافة المصروف */
+.expenseCard{
+  margin-bottom:12px;
+  padding:14px 16px;
+  border-radius:10px;
+}
+
+.expenseCard h2{
+  margin-bottom:9px;
+  font-size:16px;
+}
+
+.expenseForm{
+  grid-template-columns:minmax(140px,1fr) minmax(120px,.8fr) minmax(220px,2fr) auto;
+  gap:8px;
+}
+
+.expenseForm input,
+.expenseForm select{
+  height:36px;
+  padding:0 10px;
+  font-size:12px;
+}
+
+.expenseForm button{
+  height:36px;
+  padding:0 13px;
+  font-size:12px;
+}
+
+/* سجل المصاريف */
+.expenseListHead{
+  min-height:36px;
+  margin-bottom:7px;
+}
+
+.expenseListHead h2{
+  margin:0;
+}
+
+.expenseListHead label{
+  height:36px;
+  padding-right:8px;
+  box-sizing:border-box;
+}
+
+.expenseListHead input{
+  height:34px;
+  font-size:12px;
+}
+
+.expenseRow{
+  min-height:46px;
+  padding:7px 0;
+  gap:10px;
+}
+
+.expenseRow strong{
+  font-size:12px;
+}
+
+.expenseRow small{
+  font-size:10px;
+  margin-top:2px;
+  line-height:1.2;
+}
+
+.expenseRow b{
+  font-size:12px;
+  white-space:nowrap;
+}
+
+.expenseRow button{
+  width:30px;
+  height:30px;
+}
+
+.expenseEmpty{
+  padding:18px 0;
+  font-size:12px;
+}
+
+@media(max-width:800px){
+  .expenseStats{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+}
+
+@media(max-width:620px){
+  .expenseStats{
+    grid-template-columns:1fr;
+  }
+
+  .expenseForm{
+    grid-template-columns:1fr;
+  }
+
+  .expenseForm button{
+    height:36px;
+  }
+
+  .expenseListHead{
+    align-items:stretch;
+    flex-direction:column;
+  }
+
+  .expenseListHead label{
+    width:100%;
+  }
+}
+.expenseFilters{display:flex;align-items:end;gap:8px;flex-wrap:wrap;margin:4px 0 12px;padding:10px 0 2px;border-top:1px solid #edf0f5}.expenseDateField{display:flex;align-items:center;gap:7px}.expenseDateField span{font-size:11px;color:#667085}.expenseDateField input{height:36px;border:1px solid #d6deea;border-radius:8px;padding:0 9px;font-family:inherit;font-size:12px}.expenseFilterBtn,.expenseResetBtn{height:36px;border:0;border-radius:8px;padding:0 12px;font-family:inherit;display:inline-flex;align-items:center;gap:6px;cursor:pointer}.expenseFilterBtn{background:#e91e63;color:#fff}.expenseResetBtn{background:#f2f4f7;color:#344054}.expenseFilterBtn:disabled,.expenseResetBtn:disabled{opacity:.5;cursor:not-allowed}@media(max-width:620px){.expenseFilters{align-items:stretch}.expenseDateField{flex:1;min-width:145px}.expenseDateField input{width:100%}.expenseFilterBtn,.expenseResetBtn{flex:1;justify-content:center}}

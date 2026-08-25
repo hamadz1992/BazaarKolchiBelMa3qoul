@@ -1,0 +1,369 @@
+.inventoryView{padding-bottom:40px}.inventoryHeader{margin-bottom:22px}.inventoryHeader h1{display:flex;align-items:center;gap:10px;margin:0 0 7px;font-size:28px}.inventoryHeader h1 svg{color:#e91e63}.inventoryHeader p{margin:0;color:#718096}.inventoryStats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:12px}.inventoryStat{background:#fff;border:1px solid #dfe5ee;border-radius:12px;padding:11px;min-height:96px;box-shadow:0 2px 8px rgba(16,35,61,.04);position:relative}.inventoryStatIcon{position:absolute;left:10px;top:10px;width:34px;height:34px;border-radius:10px;background:#edf4ff;color:#1769e8;display:grid;place-items:center;font-weight:800}.inventoryStatIcon svg{width:22px}.inventoryStat span{display:block;color:#475467;font-size:13px;margin-bottom:8px}.inventoryStat strong{display:block;font-size:21px;color:#182230;line-height:1.1}.inventoryStat small{display:block;color:#7b8798;margin-top:4px;font-size:11px}.inventoryStat.total .inventoryStatIcon{background:#fff0df;color:#f57c00}.inventoryStat.total strong{color:#f57c00}.inventoryStat.good .inventoryStatIcon{background:#e6f7f0;color:#15966f}.inventoryStat.good strong{color:#15966f}.inventoryStat.warning .inventoryStatIcon{background:#fff0f5;color:#e91e63}.inventoryStat.warning strong{color:#d11b5d}.inventoryStat.danger .inventoryStatIcon{background:#ffeaea;color:#d92d20}.inventoryStat.danger strong{color:#d92d20}.inventoryMovementsBar{display:flex;justify-content:flex-start;align-items:center;margin:0 0 12px;} .inventoryMovementsAction{height:38px;padding:0 13px;border:1px solid #dfe4ec;background:#fff;color:#526174;border-radius:7px;display:inline-flex;align-items:center;gap:7px;font-weight:600;cursor:pointer}.inventoryMovementsAction:hover{border-color:#e91e63;color:#e91e63;background:#fff7fa}
+.inventoryPanel{background:#fff;border:1px solid #dfe5ee;border-radius:12px;box-shadow:0 2px 8px rgba(16,35,61,.04);overflow:hidden}.inventoryToolbar{padding:18px;display:flex;gap:12px;align-items:center;border-bottom:1px solid #e8edf3}.inventorySearch{height:44px;border:1px solid #d6deea;border-radius:8px;display:flex;align-items:center;gap:9px;padding:0 12px;flex:1;color:#7b8798}.inventorySearch input{border:0;outline:0;width:100%;font-family:inherit;font-size:14px}.inventoryFilters{display:flex;gap:7px}.inventoryFilters button{height:40px;padding:0 14px;border:1px solid #d6deea;background:#fff;border-radius:7px;color:#475467;font-family:inherit;cursor:pointer}.inventoryFilters button.active{background:#ed1b68;border-color:#ed1b68;color:#fff}.inventoryTableWrap{overflow:auto}.inventoryTable{width:100%;border-collapse:collapse;min-width:950px}.inventoryTable th{background:#f8fafc;color:#475467;font-size:13px;font-weight:700;padding:15px 13px;border-bottom:1px solid #e4e9f0;text-align:right;white-space:nowrap}.inventoryTable td{padding:14px 13px;border-bottom:1px solid #edf0f4;color:#344054;font-size:13px;white-space:nowrap}.inventoryTable tbody tr:hover{background:#fcfdff}.inventoryProduct{display:flex;align-items:center;gap:9px}.inventoryProduct span{width:32px;height:32px;border-radius:8px;background:#edf4ff;color:#1769e8;display:grid;place-items:center}.inventoryProduct strong{color:#182230}.inventoryValue{font-weight:700;color:#15966f}.qtyGood{color:#15966f}.qtyWarning{color:#d97706}.qtyDanger{color:#d92d20}.inventoryStatus{display:inline-flex;padding:6px 11px;border-radius:999px;font-size:12px;font-weight:700}.inventoryStatus.ok{background:#e8f7f0;color:#14815f}.inventoryStatus.low{background:#fff2df;color:#b54708}.inventoryStatus.out{background:#feecec;color:#c5221f}.inventoryEmpty{text-align:center;padding:50px;color:#7b8798}@media(max-width:1100px){.inventoryStats{grid-template-columns:repeat(3,1fr)}}@media(max-width:700px){.inventoryStats{grid-template-columns:1fr 1fr}.inventoryToolbar{flex-direction:column;align-items:stretch}.inventoryFilters{overflow:auto}.inventoryFilters button{flex:1}}.inventoryHeader{display:flex;align-items:center;justify-content:space-between;gap:16px}.inventoryMovementsAction{height:42px;padding:0 14px;border:1px solid #dfe4ec;background:#fff;color:#526174;border-radius:7px;display:inline-flex;align-items:center;gap:7px;font-weight:600}.inventoryMovementsAction:hover{border-color:#e91e63;color:#e91e63;background:#fff7fa}@media(max-width:800px){.inventoryHeader{flex-direction:column;align-items:stretch}.inventoryMovementsAction{width:fit-content}}
+.inventoryLoadError{margin:14px 18px 0;padding:10px 12px;border:1px solid #f4b4c0;background:#fff7f9;border-radius:8px;color:#b4234e;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px}.inventoryLoadError button{border:1px solid #f4b4c0;background:#fff;border-radius:7px;padding:7px 12px;color:#b4234e;font-family:inherit;cursor:pointer}@media(max-width:700px){.inventoryLoadError{flex-direction:column;align-items:stretch}}
+
+@media(max-width:1100px){.inventoryStats{grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}.inventoryStat{padding:9px;min-height:88px}.inventoryStatIcon{width:30px;height:30px;top:8px;left:8px}.inventoryStat strong{font-size:19px}.inventoryStat span{font-size:12px}}
+@media(max-width:900px){.inventoryStats{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+/* Inventory summary row: 5 stats + movements action in one horizontal row. */
+.inventoryView{
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  align-items:start;
+}
+.inventoryHeader{grid-column:1/-1}
+.inventoryStats{
+  grid-column:1/-1;
+  grid-row:auto;
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:8px;
+  margin:0;
+}
+.inventoryMovementsBar{
+  grid-column:1/-1;
+  grid-row:2;
+  position:absolute;
+  inset-inline-start:18px;
+  top:var(--inventory-movements-top, 0px);
+  margin:0;
+  z-index:3;
+}
+/* Keep the action in the same row as the stats by placing the whole summary band on a 6-col wrapper. */
+.inventoryView{
+  grid-template-columns:minmax(0,1fr);
+}
+.inventoryStats{
+  width:100%;
+}
+.inventoryMovementsBar{
+  position:relative;
+  inset:auto;
+  grid-column:auto;
+  grid-row:auto;
+  align-self:stretch;
+  justify-self:stretch;
+  margin:0;
+  display:flex;
+  align-items:stretch;
+}
+.inventoryMovementsAction{
+  width:100%;
+  height:auto;
+  min-height:72px;
+  justify-content:center;
+}
+/* Desktop wrapper: six equal cells: five cards + movement action. */
+@media (min-width: 1101px){
+  .inventoryView{
+    display:grid;
+    grid-template-columns:repeat(5,minmax(0,1fr)) minmax(120px,150px);
+    column-gap:8px;
+    row-gap:10px;
+  }
+  .inventoryHeader{grid-column:1/-1}
+  .inventoryStats{
+    grid-column:1 / span 5;
+    grid-row:2;
+    margin:0;
+  }
+  .inventoryMovementsBar{
+    grid-column:6;
+    grid-row:2;
+    margin:0;
+  }
+  .inventoryPanel{grid-column:1/-1;grid-row:3}
+}
+@media (max-width:1100px){
+  .inventoryMovementsBar{margin:0 0 10px;}
+}
+
+/* Final inventory summary tuning: slightly smaller and closer to the fixed top bar. */
+.inventoryView{transform:translateY(-55px);}
+.inventoryHeader{margin-bottom:8px;}
+.inventoryStats{gap:6px !important;}
+.inventoryStat{min-height:72px !important;padding:8px !important;border-radius:10px !important;}
+.inventoryStatIcon{width:28px !important;height:28px !important;top:7px !important;left:7px !important;border-radius:8px !important;}
+.inventoryStatIcon svg{width:18px !important;height:18px !important;}
+.inventoryStat span{font-size:11px !important;margin-bottom:4px !important;}
+.inventoryStat strong{font-size:17px !important;line-height:1.05 !important;}
+.inventoryStat small{font-size:10px !important;margin-top:2px !important;}
+.inventoryMovementsAction{min-height:58px !important;padding:0 10px !important;font-size:12px !important;}
+@media (min-width:1101px){
+  .inventoryView{grid-template-columns:repeat(5,minmax(0,1fr)) minmax(108px,132px) !important;column-gap:6px !important;}
+}
+
+/* Keep the inventory screen at the user's chosen -55px offset; raise only the table/panel slightly. */
+.inventoryView .inventoryPanel{transform:translateY(-10px);}
+
+/* Final inventory compact height: remove trailing whitespace below the table. */
+.inventoryView{
+  padding-bottom:0 !important;
+  min-height:0 !important;
+  height:auto !important;
+}
+.inventoryPanel{
+  margin-bottom:0 !important;
+}
+.inventoryTableWrap{
+  padding-bottom:0 !important;
+}
+
+/* Inventory page: do not reserve the full remaining viewport below the table. */
+@media (min-width: 981px){
+  body:has(.inventoryView) .fullViewStage{
+    height:auto !important;
+    min-height:0 !important;
+    overflow:visible !important;
+  }
+  body:has(.inventoryView) .fullViewBody{
+    flex:none !important;
+    height:auto !important;
+    min-height:0 !important;
+    overflow:visible !important;
+    padding-bottom:0 !important;
+  }
+  body:has(.inventoryView) .inventoryView{
+    min-height:0 !important;
+    height:auto !important;
+    margin-bottom:0 !important;
+    padding-bottom:0 !important;
+  }
+  body:has(.inventoryView) .inventoryPanel{
+    height:auto !important;
+    min-height:0 !important;
+    margin-bottom:0 !important;
+  }
+}
+
+
+/* Final pagination visibility fix: keep the full-view viewport and let the body contain the complete inventory panel, including pagination. */
+@media (min-width: 981px){
+  body:has(.inventoryView) .fullViewStage{
+    height:100% !important;
+    min-height:0 !important;
+    overflow:hidden !important;
+  }
+  body:has(.inventoryView) .fullViewBody{
+    flex:1 1 auto !important;
+    height:100% !important;
+    min-height:0 !important;
+    overflow:auto !important;
+    padding-bottom:12px !important;
+    box-sizing:border-box !important;
+  }
+  body:has(.inventoryView) .inventoryView{
+    height:auto !important;
+    min-height:0 !important;
+    overflow:visible !important;
+  }
+  body:has(.inventoryView) .inventoryPanel{
+    height:auto !important;
+    min-height:0 !important;
+  }
+}
+
+/* Hide the scrollbar while preserving scrolling. */
+body:has(.inventoryView) .fullViewBody::-webkit-scrollbar{width:0;height:0}
+body:has(.inventoryView) .fullViewBody{scrollbar-width:none}
+
+/* Final UX rule: no vertical scrolling in inventory; navigation is via pagination. */
+@media (min-width: 981px){
+  body:has(.inventoryView){
+    overflow:hidden !important;
+  }
+  body:has(.inventoryView) .fullViewStage,
+  body:has(.inventoryView) .fullViewBody{
+    overflow:hidden !important;
+  }
+  body:has(.inventoryView) .fullViewBody{
+    scrollbar-width:none !important;
+  }
+  body:has(.inventoryView) .fullViewBody::-webkit-scrollbar{
+    display:none !important;
+    width:0 !important;
+    height:0 !important;
+  }
+  body:has(.inventoryView) .inventoryPanel{
+    overflow:visible !important;
+  }
+  body:has(.inventoryView) .inventoryTableWrap{
+    overflow:visible !important;
+  }
+}
+
+
+/* Final inventory frame fit: keep the complete table + pagination visible without a trailing empty area. */
+@media (min-width: 981px){
+  .inventoryView{
+    align-content:start !important;
+    grid-auto-rows:max-content !important;
+  }
+  .inventoryPanel{
+    align-self:start !important;
+    justify-self:stretch !important;
+    height:max-content !important;
+    min-height:0 !important;
+    max-height:none !important;
+    margin-bottom:0 !important;
+  }
+  .inventoryTableWrap{
+    height:max-content !important;
+    min-height:0 !important;
+    max-height:none !important;
+    overflow:visible !important;
+    padding-bottom:0 !important;
+    margin-bottom:0 !important;
+  }
+  .inventoryTable{
+    height:auto !important;
+  }
+  .inventoryTableWrap > .pagination,
+  .inventoryTableWrap > .Pagination,
+  .inventoryTableWrap > [class*="pagination"]{
+    margin-bottom:0 !important;
+  }
+}
+
+/* Final fit: keep the table bottom bar (Pagination) visible inside the inventory frame. */
+@media (min-width: 981px){
+  .inventoryView .inventoryStats{
+    margin-bottom:6px !important;
+  }
+  .inventoryView .inventoryStat{
+    min-height:64px !important;
+    height:64px !important;
+    padding:6px 8px !important;
+  }
+  .inventoryView .inventoryStatIcon{
+    width:25px !important;
+    height:25px !important;
+    top:6px !important;
+    left:6px !important;
+  }
+  .inventoryView .inventoryStatIcon svg{
+    width:14px !important;
+    height:14px !important;
+  }
+  .inventoryView .inventoryStat span{
+    font-size:10px !important;
+    margin-bottom:3px !important;
+  }
+  .inventoryView .inventoryStat strong{
+    font-size:16px !important;
+  }
+  .inventoryView .inventoryStat small{
+    font-size:9px !important;
+    margin-top:2px !important;
+  }
+  .inventoryView .inventoryToolbar{
+    padding:6px 10px !important;
+    min-height:42px !important;
+    gap:6px !important;
+  }
+  .inventoryView .inventorySearch{
+    height:34px !important;
+  }
+  .inventoryView .inventoryFilters button{
+    height:30px !important;
+    padding:0 10px !important;
+  }
+  .inventoryView .inventoryTable th{
+    padding:5px 8px !important;
+    font-size:11px !important;
+    line-height:1 !important;
+  }
+  .inventoryView .inventoryTable td{
+    padding:4px 8px !important;
+    font-size:11px !important;
+    line-height:1 !important;
+  }
+  .inventoryView .inventoryTable tbody tr{
+    height:28px !important;
+  }
+  .inventoryView .inventoryProduct span{
+    width:24px !important;
+    height:24px !important;
+  }
+  .inventoryView .inventoryStatus{
+    padding:3px 8px !important;
+    font-size:10px !important;
+  }
+
+  /* Pagination is part of the visible table frame, never clipped. */
+  .inventoryView .inventoryPanel > .paginationBar,
+  .inventoryView .inventoryPanel .paginationBar{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    flex-wrap:nowrap !important;
+    min-height:40px !important;
+    height:40px !important;
+    box-sizing:border-box !important;
+    margin:0 !important;
+    padding:4px 8px !important;
+    overflow:visible !important;
+    visibility:visible !important;
+    opacity:1 !important;
+  }
+  .inventoryView .paginationBar .paginationBtn,
+  .inventoryView .paginationBar .paginationPage{
+    height:30px !important;
+    min-width:30px !important;
+    padding:0 8px !important;
+    font-size:12px !important;
+  }
+  .inventoryView .paginationBar .paginationMeta{
+    font-size:10px !important;
+    margin-inline-start:4px !important;
+  }
+
+  .inventoryView .inventoryPanel{
+    overflow:visible !important;
+  }
+  .inventoryView .inventoryTableWrap{
+    overflow:visible !important;
+    margin-bottom:0 !important;
+  }
+}
+
+/* Inventory: separate movement actions from the history screen. */
+.inventoryMovementsBar{display:flex !important;gap:6px !important;align-items:stretch !important;}
+.inventoryMovementsBar .inventoryMovementsAction{flex:1 1 0 !important;white-space:nowrap;}
+.inventoryHistoryAction{border-color:#e6d5dc !important;color:#6b7280 !important;background:#fff !important;}
+.inventoryHistoryAction:hover{border-color:#e91e63 !important;color:#e91e63 !important;background:#fff7fa !important;}
+@media (min-width:1101px){.inventoryView{grid-template-columns:repeat(5,minmax(0,1fr)) minmax(170px,200px) !important;}.inventoryMovementsBar{grid-column:6 !important;}}
+
+/* Final fix: keep both inventory movement buttons fully inside the last summary cell. */
+@media (min-width:1101px){
+  .inventoryView{
+    grid-template-columns:repeat(5,minmax(0,1fr)) minmax(230px,260px) !important;
+    column-gap:6px !important;
+  }
+  .inventoryMovementsBar{
+    grid-column:6 !important;
+    width:100% !important;
+    min-width:0 !important;
+    display:flex !important;
+    flex-direction:row !important;
+    align-items:stretch !important;
+    justify-content:stretch !important;
+    gap:6px !important;
+    overflow:visible !important;
+  }
+  .inventoryMovementsBar .inventoryMovementsAction{
+    flex:1 1 0 !important;
+    width:auto !important;
+    min-width:0 !important;
+    max-width:none !important;
+    height:58px !important;
+    min-height:58px !important;
+    padding:0 8px !important;
+    white-space:nowrap !important;
+  }
+}
+
+/* Final position tuning: raise only the inventory table/panel a little more. */
+.inventoryView .inventoryPanel{
+  transform:translateY(-17px) !important;
+}
