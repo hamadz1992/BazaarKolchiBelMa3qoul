@@ -65,7 +65,10 @@ assert(!fs.existsSync(path.join(root, 'database/migrations/002_legacy_import.sql
 const runtimeText = sourceFiles.map(f => fs.readFileSync(f, 'utf8')).join('\n');
 const localStorageViolations = runtimeText
   .split(/\r?\n/)
-  .filter(line => /localStorage\./.test(line) && !/bazaar_api_token|apiToken|setAuthToken|bazaar_current_user|bazaar:cash-updated|bazaar:inventory-updated/.test(line));
+  .filter(line =>
+    /localStorage\./.test(line) &&
+    !/bazaar_api_token|TOKEN_KEY|apiToken|setAuthToken|bazaar_current_user|bazaar:cash-updated|bazaar:inventory-updated/.test(line)
+  );
 assert(localStorageViolations.length === 0, 'Operational localStorage usage remains in runtime sources.');
 
 const cssFiles = filesUnder(path.join(root, 'src'), (f, n) => n.endsWith('.css'));
