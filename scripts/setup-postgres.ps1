@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-  [string]$DatabaseName = 'bazaar_kolchi',
+  [string]$DatabaseName = 'BazaarKolchiBelMa3qoul'
   [string]$HostName = 'localhost',
   [int]$Port = 5432,
   [string]$DbUser = 'postgres'
