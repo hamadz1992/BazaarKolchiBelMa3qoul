@@ -15,9 +15,7 @@ let apiStarting = false;
 let appQuitting = false;
 
 function apiScriptPath() {
-  if (app.isPackaged) {
-    return path.join(process.resourcesPath, 'app.asar.unpacked', 'server', 'index.mjs');
-  }
+  if (app.isPackaged) return path.join(process.resourcesPath, 'app.asar.unpacked', 'server', 'index.mjs');
   return path.join(__dirname, '..', 'server', 'index.mjs');
 }
 
@@ -149,9 +147,7 @@ function createWindow() {
 
 ipcMain.handle('desktop:set-auth-token', async (_event, token) => {
   authToken = typeof token === 'string' ? token.trim() : '';
-  if (authToken && app.isPackaged) {
-    setTimeout(() => checkForUpdates({ silent: true, token: authToken }).catch(() => {}), 1200);
-  }
+  if (authToken && app.isPackaged) setTimeout(() => checkForUpdates({ silent: true, token: authToken }).catch(() => {}), 1200);
   return true;
 });
 ipcMain.handle('desktop:update-check', async () => checkForUpdates({ silent: false, token: authToken }));
@@ -254,10 +250,12 @@ ipcMain.handle('desktop:open-path', async (_event, target) => {
   return true;
 });
 
-app.whenReady().then(async () => {
+app.whenReady().then(() => {
   ensureProductionEnv();
-  await startApiServer();
   createWindow();
+  // Do not block the first window on the local API startup/health check.
+  // The API starts in the background while the UI becomes interactive.
+  setImmediate(() => startApiServer().catch((error) => console.error('[desktop] API startup error:', error?.message || error)));
 });
 
 app.on('activate', () => {
