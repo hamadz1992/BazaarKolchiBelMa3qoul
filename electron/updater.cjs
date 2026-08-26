@@ -200,61 +200,45 @@ async function createDatabaseBackup(token, destination) {
   return { source: result.path, destination };
 }
 
-async function installWithRestart(installerPath) {
-  if (!installerPath || !fs.existsSync(installerPath)) {
-    throw new Error('ملف التحديث غير موجود.');
-  }
+function getJson(url) {
+  return new Promise((resolve, reject) => {
+    const req = https.get(
+      url,
+      {
+        family: 4,
+        headers: {
+          'User-Agent': `${app.getName()}/${app.getVersion()}`,
+          Accept: 'application/vnd.github+json'
+        }
+      },
+      (res) => {
+        const chunks = [];
 
-  const appExe = app.getPath('exe');
-  const appDir = path.dirname(appExe);
+        res.on('data', (chunk) => chunks.push(chunk));
 
-  const escapedInstaller = installerPath.replace(/'/g, "''");
-  const escapedApp = appExe.replace(/'/g, "''");
-  const escapedAppDir = appDir.replace(/'/g, "''");
+        res.on('end', () => {
+          const body = Buffer.concat(chunks).toString('utf8');
 
-  const script = `
-$ErrorActionPreference = 'Stop'
+          if (res.statusCode < 200 || res.statusCode >= 300) {
+            reject(new Error(`Update server returned HTTP ${res.statusCode}`));
+            return;
+          }
 
-$installer = '${escapedInstaller}'
-$appExe = '${escapedApp}'
-$appDir = '${escapedAppDir}'
+          try {
+            resolve(JSON.parse(body));
+          } catch {
+            reject(new Error('Invalid update metadata'));
+          }
+        });
+      }
+    );
 
-if (-not (Test-Path -LiteralPath $installer)) {
-  exit 10
-}
+    req.setTimeout(30000, () => {
+      req.destroy(new Error('Update check timed out'));
+    });
 
-Start-Sleep -Seconds 2
-
-$process = Start-Process -FilePath $installer -ArgumentList '/S' -PassThru -Wait
-
-if ($process.ExitCode -ne 0) {
-  exit $process.ExitCode
-}
-
-Start-Sleep -Seconds 3
-
-if (Test-Path -LiteralPath $appExe) {
-  Start-Process -FilePath $appExe -WorkingDirectory $appDir
-}
-`;
-
-  const child = spawn(
-    'powershell.exe',
-    [
-      '-NoProfile',
-      '-ExecutionPolicy', 'Bypass',
-      '-WindowStyle', 'Hidden',
-      '-Command', script
-    ],
-    {
-      detached: true,
-      stdio: 'ignore',
-      windowsHide: true
-    }
-  );
-
-  child.unref();
-  app.quit();
+    req.on('error', reject);
+  });
 }
 
 async function prepareCurrentVersionBackup(token) {
