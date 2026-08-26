@@ -33,18 +33,23 @@ function versionTuple(v) {
 function versionString(v) { return versionTuple(v).join('.'); }
 function compareVersions(a, b) {
   const x = versionTuple(a), y = versionTuple(b);
-  for (let i = 0; i < 3; i += 1) { if (x[i] !== y[i]) return x[i] - y[i]; }
+  for (let i = 0; i < 3; i += 1) {
+    if (x[i] !== y[i]) return x[i] - y[i];
+  }
   return 0;
 }
 function isNewer(remote, local) { return compareVersions(remote, local) > 0; }
-function safeVersion(v) { return String(v || '').replace(/^v/i, '').replace(/[^0-9A-Za-z._-]/g, '_') || 'unknown'; }
+function safeVersion(v) {
+  return String(v || '').replace(/^v/i, '').replace(/[^0-9A-Za-z._-]/g, '_') || 'unknown';
+}
 
 function getJson(url) {
   return new Promise((resolve, reject) => {
     const req = https.get(url, {
+      family: 4,
       headers: {
         'User-Agent': `${app.getName()}/${app.getVersion()}`,
-        'Accept': 'application/vnd.github+json'
+        Accept: 'application/vnd.github+json'
       }
     }, (res) => {
       const chunks = [];
@@ -55,10 +60,14 @@ function getJson(url) {
           reject(new Error(`Update server returned HTTP ${res.statusCode}`));
           return;
         }
-        try { resolve(JSON.parse(body)); } catch { reject(new Error('Invalid update metadata')); }
+        try {
+          resolve(JSON.parse(body));
+        } catch {
+          reject(new Error('Invalid update metadata'));
+        }
       });
     });
-    req.setTimeout(12000, () => req.destroy(new Error('Update check timed out')));
+    req.setTimeout(30000, () => req.destroy(new Error('Update check timed out')));
     req.on('error', reject);
   });
 }
@@ -119,7 +128,11 @@ function download(url, destination) {
       file.on('finish', () => file.close(() => resolve({ total, received })));
     });
     request.setTimeout(120000, () => request.destroy(new Error('انتهت مهلة تنزيل التحديث.')));
-    request.on('error', (err) => { file.close(); fs.unlink(destination, () => {}); reject(err); });
+    request.on('error', (err) => {
+      file.close();
+      fs.unlink(destination, () => {});
+      reject(err);
+    });
   });
 }
 
@@ -154,7 +167,9 @@ async function verifyChecksum(target, release) {
     const actual = (await sha256(target)).toLowerCase();
     if (expected !== actual) throw new Error('فشل التحقق من سلامة ملف التحديث.');
     return true;
-  } finally { await fsp.rm(checkFile, { force: true }).catch(() => {}); }
+  } finally {
+    await fsp.rm(checkFile, { force: true }).catch(() => {});
+  }
 }
 
 async function readState() {
@@ -180,7 +195,7 @@ async function listPreviousVersions() {
       out.push({ version: v, createdAt: meta.createdAt, installer: meta.installer || null, databaseBackup: meta.databaseBackup || null });
     } catch {}
   }
-  out.sort((a,b) => compareVersions(b.version, a.version));
+  out.sort((a, b) => compareVersions(b.version, a.version));
   return out.slice(0, 3);
 }
 
@@ -192,53 +207,13 @@ async function prunePreviousVersions() {
     if (e.isDirectory() && !keep.has(e.name)) await fsp.rm(path.join(versionsDir(), e.name), { recursive: true, force: true });
   }
 }
+
 async function createDatabaseBackup(token, destination) {
   if (!token) throw new Error('لا توجد جلسة مصادقة لإنشاء نسخة قاعدة البيانات.');
   const result = await requestJson(`${API_BASE}/backup/create`, { method: 'POST', token });
   if (!result?.path || !fs.existsSync(result.path)) throw new Error('تعذر إنشاء نسخة قاعدة البيانات قبل التحديث.');
   await fsp.copyFile(result.path, destination);
   return { source: result.path, destination };
-}
-
-function getJson(url) {
-  return new Promise((resolve, reject) => {
-    const req = https.get(
-      url,
-      {
-        family: 4,
-        headers: {
-          'User-Agent': `${app.getName()}/${app.getVersion()}`,
-          Accept: 'application/vnd.github+json'
-        }
-      },
-      (res) => {
-        const chunks = [];
-
-        res.on('data', (chunk) => chunks.push(chunk));
-
-        res.on('end', () => {
-          const body = Buffer.concat(chunks).toString('utf8');
-
-          if (res.statusCode < 200 || res.statusCode >= 300) {
-            reject(new Error(`Update server returned HTTP ${res.statusCode}`));
-            return;
-          }
-
-          try {
-            resolve(JSON.parse(body));
-          } catch {
-            reject(new Error('Invalid update metadata'));
-          }
-        });
-      }
-    );
-
-    req.setTimeout(30000, () => {
-      req.destroy(new Error('Update check timed out'));
-    });
-
-    req.on('error', reject);
-  });
 }
 
 async function prepareCurrentVersionBackup(token) {
@@ -272,16 +247,74 @@ async function prepareCurrentVersionBackup(token) {
   return manifest;
 }
 
+function installWithRestart(installerPath) {
+  return new Promise((resolve, reject) => {
+    if (!installerPath || !fs.existsSync(installerPath)) {
+      reject(new Error('ملف تثبيت التحديث غير موجود.'));
+      return;
+    }
+    if (!app.isPackaged || process.platform !== 'win32') {
+      reject(new Error('تثبيت التحديث متاح فقط على نسخة Windows المثبتة.'));
+      return;
+    }
+
+    const escapedExe = installerPath.replace(/'/g, "''");
+    const updaterScript = path.join(os.tmpdir(), `bazaar-update-${Date.now()}-${Math.random().toString(16).slice(2)}.ps1`);
+    const appExe = process.execPath;
+    const escapedAppExe = appExe.replace(/'/g, "''");
+    const script = [
+      '$ErrorActionPreference = "Stop"',
+      '$installer = \'', escapedExe, '\'',
+      '$appExe = \'', escapedAppExe, '\'',
+      '$parentPid = ', String(process.pid), '',
+      'for ($i = 0; $i -lt 120; $i++) {',
+      '  try {',
+      '    if (-not (Get-Process -Id $parentPid -ErrorAction SilentlyContinue)) { break }',
+      '  } catch { break }',
+      '  Start-Sleep -Milliseconds 500',
+      '}',
+      'Start-Process -FilePath $installer -ArgumentList "/S" -Wait',
+      'Start-Sleep -Seconds 2',
+      'if (Test-Path $appExe) { Start-Process -FilePath $appExe }',
+      'Remove-Item -LiteralPath $PSCommandPath -Force -ErrorAction SilentlyContinue'
+    ].join("`r`n");
+
+    fs.writeFileSync(updaterScript, script, 'utf8');
+
+    const child = spawn('powershell.exe', [
+      '-NoProfile',
+      '-NonInteractive',
+      '-ExecutionPolicy',
+      'Bypass',
+      '-File',
+      updaterScript
+    ], {
+      detached: true,
+      stdio: 'ignore',
+      windowsHide: true
+    });
+
+    child.unref();
+    app.isQuitting = true;
+    app.quit();
+    resolve({ ok: true, restarting: true });
+  });
+}
+
 async function performUpdate(remoteVersion, release, token) {
   if (!token) throw new Error('سجّل الدخول أولًا حتى يتم أخذ نسخة احتياطية من قاعدة البيانات.');
 
   await prepareCurrentVersionBackup(token);
   const asset = findInstallerAsset(release);
   if (!asset?.browser_download_url) throw new Error('لم يتم العثور على ملف تثبيت Windows للإصدار الجديد.');
+
   const target = path.join(os.tmpdir(), `BazaarKolchiBelMa3qoul-${safeVersion(remoteVersion)}.exe`);
   await fsp.rm(target, { force: true });
   await download(asset.browser_download_url, target);
   await verifyChecksum(target, release);
+
+  const stat = await fsp.stat(target);
+  if (stat.size < 1024 * 1024) throw new Error('ملف التحديث الذي تم تنزيله غير صالح أو غير مكتمل.');
 
   const stagedDir = path.join(versionsDir(), safeVersion(remoteVersion));
   await fsp.mkdir(stagedDir, { recursive: true });
@@ -291,19 +324,27 @@ async function performUpdate(remoteVersion, release, token) {
 }
 
 async function checkForUpdates(options = {}) {
-  if (!app.isPackaged || process.platform !== 'win32') return { ok: true, available: false, skipped: true, current: app.getVersion() };
+  if (!app.isPackaged || process.platform !== 'win32') {
+    return { ok: true, available: false, skipped: true, current: app.getVersion() };
+  }
+
   try {
     const release = await getJson(RELEASES_URL);
     const remoteVersion = versionString(release.tag_name || release.name || '');
-    if (!remoteVersion || !isNewer(remoteVersion, app.getVersion())) return { ok: true, available: false, current: app.getVersion() };
+    if (!remoteVersion || !isNewer(remoteVersion, app.getVersion())) {
+      return { ok: true, available: false, current: app.getVersion(), remote: remoteVersion || null };
+    }
+
     const token = options.token || '';
-    if (!token) return { ok: true, available: true, version: remoteVersion, requiresLogin: true };
+    if (!token) {
+      return { ok: true, available: true, version: remoteVersion, requiresLogin: true };
+    }
 
     const confirm = await dialog.showMessageBox({
       type: 'info',
       title: 'تحديث جديد متاح',
       message: `يتوفر إصدار جديد ${remoteVersion}.`,
-      detail: `الإصدار الحالي: ${app.getVersion()}\n\nسيتم أولًا حفظ نسخة من قاعدة البيانات والإصدار الحالي، ثم تنزيل وتثبيت الإصدار الجديد وإعادة تشغيل البرنامج.\n\nهل تريد التحديث الآن؟`,
+      detail: `الإصدار الحالي: ${app.getVersion()}\n\nسيتم حفظ نسخة من قاعدة البيانات والإصدار الحالي، ثم تنزيل وتثبيت الإصدار الجديد وإعادة تشغيل البرنامج تلقائيًا.`,
       buttons: ['تحديث الآن', 'لاحقًا'],
       defaultId: 0,
       cancelId: 1
@@ -315,7 +356,11 @@ async function checkForUpdates(options = {}) {
     return { ok: true, available: true, updated: true, version: remoteVersion };
   } catch (error) {
     if (options.silent) return { ok: false, error: error?.message || String(error) };
-    await dialog.showMessageBox({ type: 'warning', title: 'تعذر تحديث البرنامج', message: error?.message || 'حدث خطأ أثناء التحديث.' });
+    await dialog.showMessageBox({
+      type: 'warning',
+      title: 'تعذر تحديث البرنامج',
+      message: error?.message || 'حدث خطأ أثناء التحديث.'
+    });
     return { ok: false, error: error?.message || String(error) };
   }
 }
@@ -331,17 +376,15 @@ async function rollbackVersion(version, token) {
   const confirm = await dialog.showMessageBox({
     type: 'warning', title: 'استعادة إصدار سابق',
     message: `استعادة الإصدار ${safeVersion(version)}؟`,
-    detail: 'سيتم أولًا استعادة قاعدة البيانات المرتبطة بهذا الإصدار، ثم تثبيت البرنامج وإعادة تشغيله. هذا الإجراء لا يمكن التراجع عنه أثناء تنفيذه.',
+    detail: 'سيتم أولًا استعادة قاعدة البيانات المرتبطة بهذا الإصدار، ثم تثبيت البرنامج وإعادة تشغيله.',
     buttons: ['استعادة', 'إلغاء'], defaultId: 1, cancelId: 1
   });
   if (confirm.response !== 0) return { ok: true, cancelled: true };
 
-  // Restore the matching database before downgrading the application.
-  const backupDir = path.dirname(manifest.databaseBackup);
   const managedBackupDir = path.join(appDataRoot(), 'Backups');
   const target = path.join(managedBackupDir, path.basename(manifest.databaseBackup));
   await fsp.mkdir(managedBackupDir, { recursive: true });
-  if (path.resolve(backupDir) !== path.resolve(managedBackupDir)) {
+  if (path.resolve(path.dirname(manifest.databaseBackup)) !== path.resolve(managedBackupDir)) {
     await fsp.copyFile(manifest.databaseBackup, target);
   }
   await requestJson(`${API_BASE}/backup/restore`, { method: 'POST', token }, { filename: path.basename(target) });
