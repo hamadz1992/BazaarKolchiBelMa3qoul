@@ -1,7 +1,7 @@
 {
   "name": "bazaar-kolchi-belma3qoul",
   "private": true,
-  "version": "0.2.6",
+  "version": "0.2.8",
   "type": "module",
   "main": "electron/main.cjs",
   "scripts": {
