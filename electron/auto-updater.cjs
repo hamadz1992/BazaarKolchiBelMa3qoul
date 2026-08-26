@@ -1,8 +1,8 @@
 const fs = require('fs');
 const fsp = require('fs/promises');
 const path = require('path');
-const os = require('os');
 const https = require('https');
+const http = require('http');
 const { app, dialog } = require('electron');
 const { autoUpdater } = require('electron-updater');
 
@@ -34,7 +34,8 @@ autoUpdater.disableDifferentialDownload = true;
 function requestJson(url, token) {
   return new Promise((resolve, reject) => {
     const u = new URL(url);
-    const req = https.request(u, {
+    const transport = u.protocol === 'https:' ? https : http;
+    const req = transport.request(u, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -145,7 +146,7 @@ async function checkForUpdates(options = {}) {
     log('INFO', `Update downloaded: ${info?.version || remoteVersion}`);
 
     // electron-updater 6.x: silent NSIS install + force relaunch after installation.
-    // This is intentionally used instead of a custom PowerShell installer.
+    // This replaces the custom PowerShell installer that previously failed to relaunch.
     autoUpdater.quitAndInstall(true, true);
     return { ok: true, available: true, updated: true, version: remoteVersion };
   } catch (error) {
