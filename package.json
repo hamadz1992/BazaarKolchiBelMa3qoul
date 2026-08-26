@@ -1,7 +1,7 @@
 {
   "name": "bazaar-kolchi-belma3qoul",
   "private": true,
-  "version": "0.2.1",
+  "version": "0.2.3",
   "type": "module",
   "main": "electron/main.cjs",
   "scripts": {
@@ -41,40 +41,40 @@
     "electron-builder": "^26.0.12",
     "wait-on": "^8.0.3"
   },
-"build": {
-  "appId": "com.belma3qoul.bazaar",
-  "productName": "بزار كل شيء بالمعقول",
-  "directories": {
-    "output": "release"
-  },
-  "files": [
-    "dist/**/*",
-    "electron/**/*",
-    "package.json",
-    "server/**/*"
-  ],
-  "extraResources": [
-    {
-      "from": "runtime/node-bin",
-      "to": "node"
+  "build": {
+    "appId": "com.belma3qoul.bazaar",
+    "productName": "بزار كل شيء بالمعقول",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json",
+      "server/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "runtime/node-bin",
+        "to": "node"
+      }
+    ],
+    "asarUnpack": [
+      "server/**/*",
+      "node_modules/**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "artifactName": "BazaarKolchiBelMa3qoul-Setup-${version}.${ext}"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "hamadz1992",
+      "repo": "BazaarKolchiBelMa3qoul",
+      "releaseType": "release"
     }
-  ],
- "asarUnpack": [
-  "server/**/*",
-  "node_modules/**/*"
-],
-   "win": {
-    "target": "nsis",
-    "artifactName": "BazaarKolchiBelMa3qoul-Setup-${version}.${ext}"
   },
-  "publish": {
-    "provider": "github",
-    "owner": "hamadz1992",
-    "repo": "BazaarKolchiBelMa3qoul",
-    "releaseType": "release"
+  "allowScripts": {
+    "electron@43.2.0": true
   }
-},
-"allowScripts": {
-  "electron@43.2.0": true
-}
 }

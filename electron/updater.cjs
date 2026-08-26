@@ -192,12 +192,6 @@ async function prunePreviousVersions() {
     if (e.isDirectory() && !keep.has(e.name)) await fsp.rm(path.join(versionsDir(), e.name), { recursive: true, force: true });
   }
 }
-
-async function getCash(token) {
-  if (!token) return null;
-  return requestJson(`${API_BASE}/cash`, { token });
-}
-
 async function createDatabaseBackup(token, destination) {
   if (!token) throw new Error('لا توجد جلسة مصادقة لإنشاء نسخة قاعدة البيانات.');
   const result = await requestJson(`${API_BASE}/backup/create`, { method: 'POST', token });
@@ -248,12 +242,9 @@ async function prepareCurrentVersionBackup(token) {
 }
 
 async function performUpdate(remoteVersion, release, token) {
-  if (!token) throw new Error('سجّل الدخول أولًا حتى يتم أخذ نسخة احتياطية من قاعدة البيانات قبل التحديث.');
-  const cash = await getCash(token);
-  if (cash?.session) throw new Error('أغلق الصندوق أولًا ثم أعد محاولة تحديث البرنامج.');
+  if (!token) throw new Error('سجّل الدخول أولًا حتى يتم أخذ نسخة احتياطية من قاعدة البيانات.');
 
   await prepareCurrentVersionBackup(token);
-
   const asset = findInstallerAsset(release);
   if (!asset?.browser_download_url) throw new Error('لم يتم العثور على ملف تثبيت Windows للإصدار الجديد.');
   const target = path.join(os.tmpdir(), `BazaarKolchiBelMa3qoul-${safeVersion(remoteVersion)}.exe`);
@@ -301,9 +292,6 @@ async function checkForUpdates(options = {}) {
 async function rollbackVersion(version, token) {
   if (!app.isPackaged || process.platform !== 'win32') throw new Error('الاستعادة متاحة على نسخة Windows المثبتة فقط.');
   if (!token) throw new Error('سجّل الدخول أولًا.');
-  const cash = await getCash(token);
-  if (cash?.session) throw new Error('أغلق الصندوق أولًا ثم أعد محاولة الاستعادة.');
-
   const dir = path.join(versionsDir(), safeVersion(version));
   const manifest = JSON.parse(await fsp.readFile(path.join(dir, 'manifest.json'), 'utf8'));
   if (!manifest.installer || !fs.existsSync(manifest.installer)) throw new Error('ملف تثبيت هذا الإصدار غير متوفر محليًا.');
