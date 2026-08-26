@@ -201,11 +201,58 @@ async function createDatabaseBackup(token, destination) {
 }
 
 async function installWithRestart(installerPath) {
+  if (!installerPath || !fs.existsSync(installerPath)) {
+    throw new Error('ملف التحديث غير موجود.');
+  }
+
   const appExe = app.getPath('exe');
+  const appDir = path.dirname(appExe);
+
   const escapedInstaller = installerPath.replace(/'/g, "''");
   const escapedApp = appExe.replace(/'/g, "''");
-  const script = `$ErrorActionPreference='Stop'; Start-Process -FilePath '${escapedInstaller}' -ArgumentList '/S' -Wait; Start-Sleep -Seconds 2; if (Test-Path '${escapedApp}') { Start-Process -FilePath '${escapedApp}' }`;
-  const child = spawn('powershell.exe', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-WindowStyle', 'Hidden', '-Command', script], { detached: true, stdio: 'ignore', windowsHide: true });
+  const escapedAppDir = appDir.replace(/'/g, "''");
+
+  const script = `
+$ErrorActionPreference = 'Stop'
+
+$installer = '${escapedInstaller}'
+$appExe = '${escapedApp}'
+$appDir = '${escapedAppDir}'
+
+if (-not (Test-Path -LiteralPath $installer)) {
+  exit 10
+}
+
+Start-Sleep -Seconds 2
+
+$process = Start-Process -FilePath $installer -ArgumentList '/S' -PassThru -Wait
+
+if ($process.ExitCode -ne 0) {
+  exit $process.ExitCode
+}
+
+Start-Sleep -Seconds 3
+
+if (Test-Path -LiteralPath $appExe) {
+  Start-Process -FilePath $appExe -WorkingDirectory $appDir
+}
+`;
+
+  const child = spawn(
+    'powershell.exe',
+    [
+      '-NoProfile',
+      '-ExecutionPolicy', 'Bypass',
+      '-WindowStyle', 'Hidden',
+      '-Command', script
+    ],
+    {
+      detached: true,
+      stdio: 'ignore',
+      windowsHide: true
+    }
+  );
+
   child.unref();
   app.quit();
 }
