@@ -4,7 +4,6 @@ const http = require('http');
 const { checkForUpdates, listPreviousVersions, rollbackVersion } = require('./updater.cjs');
 const path = require('path');
 const fs = require('fs');
-
 const isDev = !app.isPackaged;
 let appCloseApproved = false;
 let mainWindow = null;
@@ -15,7 +14,16 @@ let apiStarting = false;
 let appQuitting = false;
 
 function apiScriptPath() {
-  return path.join(app.isPackaged ? process.resourcesPath : path.join(__dirname, '..'), 'server', 'index.mjs');
+  if (app.isPackaged) {
+    return path.join(
+      process.resourcesPath,
+      'app.asar.unpacked',
+      'server',
+      'index.mjs'
+    );
+  }
+
+  return path.join(__dirname, '..', 'server', 'index.mjs');
 }
 
 function checkLocalApi() {
@@ -79,12 +87,15 @@ async function startApiServer() {
     : path.join(apiRoot, '.env')
 };
 
-    apiProcess = spawn(process.execPath, [script], {
-      cwd: apiRoot,
-      env,
-      stdio: ['ignore', 'pipe', 'pipe'],
-      windowsHide: true
-    });
+    const nodePath = app.isPackaged
+  ? path.join(process.resourcesPath, 'node', 'node.exe')
+  : process.execPath;
+apiProcess = spawn(nodePath, [script], {
+  cwd: apiRoot,
+  env,
+  stdio: ['ignore', 'pipe', 'pipe'],
+  windowsHide: true
+});
 
     apiProcess.stdout?.on('data', (chunk) => console.log(`[api] ${String(chunk).trimEnd()}`));
     apiProcess.stderr?.on('data', (chunk) => console.error(`[api] ${String(chunk).trimEnd()}`));
