@@ -1,7 +1,8 @@
 const { app, BrowserWindow, ipcMain, shell, dialog } = require('electron');
 const { spawn } = require('child_process');
 const http = require('http');
-const { checkForUpdates, listPreviousVersions, rollbackVersion } = require('./updater.cjs');
+const { checkForUpdates } = require('./auto-updater.cjs');
+const { listPreviousVersions, rollbackVersion } = require('./updater.cjs');
 const path = require('path');
 const fs = require('fs');
 const isDev = !app.isPackaged;
